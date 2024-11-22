@@ -1,0 +1,45 @@
+{
+    "name": "origin-forge-official",
+    "description": "Origin Forge Official",
+    "version": "1.1.1",
+    "type": "module",
+    "keywords": [
+        "phaser",
+        "phaser3",
+        "react",
+        "vite"
+    ],
+    "scripts": {
+        "dev": "node log.js dev & vite --config vite/config.dev.mjs",
+        "build": "node log.js build & vite build --config vite/config.prod.mjs",
+        "dev-nolog": "vite --config vite/config.dev.mjs",
+        "build-nolog": "vite build --config vite/config.prod.mjs"
+    },
+    "dependencies": {
+        "@reown/appkit": "^1.5.0",
+        "@reown/appkit-adapter-wagmi": "^1.5.0",
+        "@reown/appkit-siwe": "^1.5.1",
+        "@tanstack/react-query": "^5.61.0",
+        "@walletconnect/modal-core": "^2.7.0",
+        "@walletconnect/modal-ui": "^2.7.0",
+        "dotenv": "^16.4.5",
+        "phaser": "^3.87.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-router-dom": "^6.28.0",
+        "viem": "^2.21.48",
+        "vite-plugin-node-polyfills": "^0.22.0",
+        "wagmi": "^2.13.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.3",
+        "@types/react-dom": "^18.3.0",
+        "@vitejs/plugin-react": "^4.3.1",
+        "eslint": "^8.57.0",
+        "eslint-plugin-react": "^7.34.2",
+        "eslint-plugin-react-hooks": "^4.6.2",
+        "eslint-plugin-react-refresh": "^0.4.7",
+        "terser": "^5.28.1",
+        "vite": "^5.3.1"
+    }
+}
