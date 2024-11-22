@@ -1,10 +1,12 @@
-import { Game as MainGame } from './scenes/Game';
-import { AUTO, Game } from 'phaser';
+import PreLoad from './scenes/PreLoad';
+import MainMenu from './scenes/MainMenu';
+import Register from './scenes/Register';
+import Phaser from 'phaser';
 
 //  Find out more information about the Game Config at:
 //  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 const config = {
-    type: AUTO,
+    type: Phaser.AUTO,
     scale: {
         mode: Phaser.Scale.RESIZE,
         parent: 'game-container',
@@ -15,12 +17,14 @@ const config = {
     },
     backgroundColor: '#000000',
     scene: [
-        MainGame
+        PreLoad,
+        MainMenu,
+        Register
     ]
 };
 
 const StartGame = (parent) => {
-    return new Game({ ...config, parent });
+    return new Phaser.Game({ ...config, parent });
 }
 
 export default StartGame;

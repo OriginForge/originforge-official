@@ -23,10 +23,9 @@ function App ({isMobile}){
         <Router>
             <div id="app">
                 <Header />               
-
-                {/* <Routes>
+                <Routes>
                     <Route path="/" element={<PhaserGame ref={phaserRef} />} />
-                </Routes> */}
+                </Routes>
             </div>
         </Router>
     )
