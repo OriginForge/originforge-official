@@ -27,11 +27,32 @@ export default class PreLoad extends Scene
         this.load.image('character', 'character.png');
         this.load.image('character_name', 'character_name.png');
         this.load.image('character_name_com', 'character_name_com.png');
+        // inventory
+        this.load.image('inventory', 'inventory.png');
+        this.load.image('inventory_select', 'inventory_select.png');
+        // test items 
+        this.load.spritesheet('item1', 'item1.png', { 
+            frameWidth: 16, 
+            frameHeight: 16 
+        })
+        this.load.spritesheet('item2', 'item2.png', { 
+            frameWidth: 16, 
+            frameHeight: 16 
+        })
+        this.load.spritesheet('item3', 'item3.png', { 
+            frameWidth: 16, 
+            frameHeight: 16 
+        })
+        this.load.image('item4', 'item4.png');
+        this.load.image('item5', 'item5.png');
         // planet
         this.load.image('logo', 'logo.png');
         this.load.spritesheet('earthPlanet', 'earthPlanet.png', { frameWidth: 128, frameHeight: 128 });
         this.load.spritesheet('nodePlanet', 'nodePlanet.png', { frameWidth: 128, frameHeight: 128 });
         this.load.spritesheet('blackHole', 'blackHole.png', { frameWidth: 256, frameHeight: 256 });
+
+        // this.createItemAnimations();
+        
     }
 
     create ()
@@ -45,7 +66,31 @@ export default class PreLoad extends Scene
 
     }
 
+    // createItemAnimations() {
+    //     // item1 애니메이션
+    //     this.anims.create({
+    //         key: 'item1_anim',
+    //         frames: this.anims.generateFrameNumbers('item1', { start: 0, end: 8 }),
+    //         frameRate: 8,
+    //         repeat: -1
+    //     });
 
+    //     // item2 애니메이션
+    //     this.anims.create({
+    //         key: 'item2_anim',
+    //         frames: this.anims.generateFrameNumbers('item2', { start: 0, end: 8 }),
+    //         frameRate: 8,
+    //         repeat: -1
+    //     });
+
+    //     // item3 애니메이션
+    //     this.anims.create({
+    //         key: 'item3_anim',
+    //         frames: this.anims.generateFrameNumbers('item3', { start: 0, end: 8 }),
+    //         frameRate: 8,
+    //         repeat: -1
+    //     });
+    // }
     
 
 }

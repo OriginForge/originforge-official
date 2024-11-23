@@ -15,12 +15,39 @@ export default class RegisterBox extends Scene {
         this.isEditing = false; // 이름 편집 상태
         this.keyboardListener = null; // 키보드 리스너 저장용
         this.warningText = null; // 경고 텍스트를 위한 변수
+        this.selectedSlotIndex = -1; // 선택된 슬롯의 인덱스를 저장
     }
 
     create() {
+        this.createItemAnimations();
         this.createRegisterContainer();
     }
 
+    createItemAnimations() {
+                // item1 애니메이션
+                this.anims.create({
+                    key: 'item1_anim',
+                    frames: this.anims.generateFrameNumbers('item1', { start: 0, end: 8 }),
+                    frameRate: 8,
+                    repeat: -1
+                });
+        
+                // item2 애니메이션
+                this.anims.create({
+                    key: 'item2_anim',
+                    frames: this.anims.generateFrameNumbers('item2', { start: 0, end: 8 }),
+                    frameRate: 8,
+                    repeat: -1
+                });
+        
+                // item3 애니메이션
+                this.anims.create({
+                    key: 'item3_anim',
+                    frames: this.anims.generateFrameNumbers('item3', { start: 0, end: 8 }),
+                    frameRate: 8,
+                    repeat: -1
+                });
+    }
     createRegisterContainer() {
         const registerBox = this.add.image(0, 0, 'modalBox_bg').setScale(this.currentScale);
 
@@ -202,12 +229,180 @@ export default class RegisterBox extends Scene {
 
         characterContainer.add([characterImage, character]);
         
+        // inventory 2x5 그리드 생성
+        const inventoryContainer = this.add.container(0, 0);
+        const slotSize = 40; // 슬롯 크기
+        const padding = 3; // 패딩 크기
+        
+        // 아이템 이미지 배열과 슬롯 배열
+        const items = ['item1', 'item2', 'item3', 'item4', 'item5'];
+        const slots = [];
+        const slotContainers = [];
+        
+        // 선택 표시자와 보더 생성
+        const inventorySelect = this.add.image(0, 0, 'inventory_select')
+            .setScale(0.15)
+            .setVisible(false);
+
+        // 보더 그래픽 생성
+        const inventoryBorder = this.add.graphics();
+        inventoryBorder.lineStyle(2, 0xFFD700);
+        inventoryBorder.strokeRect(-20, -20, 40, 40);
+        inventoryBorder.setVisible(false);
+
+        // 반짝이는 애니메이션 추가 (선택 표시자와 보더 모두에 적용)
+        this.tweens.add({
+            targets: [inventorySelect, inventoryBorder],
+            alpha: 0.5,
+            duration: 500,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+        // 캐릭터 스테이트 컨테이너 생성
+        const characterState = this.add.image(0, 0, 'inventory').setScale(1);
+        const characterStateContainer = this.add.container(0, 22);
+
+        // 캐릭터 스테이트 정보 추가
+        const stateTextStyle = {
+            fontSize: '20px',
+            color: '#ffffff',
+            fontStyle: 'bold',
+            fontFamily: 'Arial',
+            stroke: '#000000',
+            strokeThickness: 2,
+            shadow: { 
+                offsetX: 2,
+                offsetY: 2,
+                color: '#000000',
+                blur: 2,
+                fill: true
+            }
+        };
+
+        const baseX = -120; // 좌측 정렬을 위한 기준 X 좌표
+        const spacing = 35; // 텍스트 간격
+
+        const idText = this.add.text(baseX, -2 * spacing, 'ID: Player123', stateTextStyle);
+        const levelText = this.add.text(baseX, -1 * spacing, 'Level: 15', stateTextStyle);
+        const heartText = this.add.text(baseX, 0, '❤️ 100/100', stateTextStyle);
+        const expText = this.add.text(baseX, 1 * spacing, 'EXP: 1500/2000', stateTextStyle);
+        const ofAmountText = this.add.text(baseX, 2 * spacing, 'OF: 1,000', stateTextStyle);
+
+        // 각 텍스트에 호버 효과 추가
+        [idText, levelText, heartText, expText, ofAmountText].forEach(text => {
+            text.setInteractive();
+            text.on('pointerover', () => {
+                text.setScale(1.1);
+                text.setStyle({ ...stateTextStyle, color: '#ffff00' });
+            });
+            text.on('pointerout', () => {
+                text.setScale(1.0);
+                text.setStyle({ ...stateTextStyle, color: '#ffffff' });
+            });
+        });
+
+        characterStateContainer.add([
+            characterState,
+            idText,
+            levelText,
+            heartText,
+            expText,
+            ofAmountText
+        ]).setScale(this.currentScale + 0.1);
+
+        
+        
+
+        // 슬롯과 아이템 생성 및 컨테이너에 추가
+        for (let row = 0; row < 2; row++) {
+            for (let col = 0; col < 5; col++) {
+                const x = col * (slotSize + padding) - (2 * (slotSize + padding));
+                const y = row * (slotSize + padding) - (2 * (slotSize + padding));
+                
+                // 각 슬롯을 위한 개별 컨테이너 생성
+                const slotContainer = this.add.container(x, y);
+                slotContainers.push(slotContainer);
+                
+                const slot = this.add.image(0, 0, 'inventory')
+                    .setScale(0.15)
+                    .setInteractive();
+                
+                const slotIndex = row * 5 + col;
+                
+                slot.on('pointerover', () => {
+                    if (this.selectedSlotIndex === -1) {
+                        inventorySelect.setVisible(true);
+                        inventoryBorder.setVisible(true);
+                        inventorySelect.setPosition(slotContainer.x, slotContainer.y);
+                        inventoryBorder.setPosition(slotContainer.x, slotContainer.y);
+                    }
+                });
+
+                slot.on('pointerout', () => {
+                    slot.clearTint();
+                    if (this.selectedSlotIndex === -1) {
+                        inventorySelect.setVisible(false);
+                        inventoryBorder.setVisible(false);
+                    }
+                });
+
+                slot.on('pointerdown', () => {
+                    // 이전에 선택된 슬롯이 있다면 선택 해제
+                    if (this.selectedSlotIndex !== -1) {
+                        slots[this.selectedSlotIndex].clearTint();
+                    }
+                    
+                    // 현재 슬롯 선택
+                    this.selectedSlotIndex = slotIndex;
+                    slot.setTint(0x808080);
+                    
+                    // 선택 표시자와 보더 위치 설정 및 표시
+                    inventorySelect.setVisible(true);
+                    inventoryBorder.setVisible(true);
+                    inventorySelect.setPosition(slotContainer.x, slotContainer.y);
+                    inventoryBorder.setPosition(slotContainer.x, slotContainer.y);
+                });
+                
+                slots.push(slot);
+                slotContainer.add(slot);
+                
+                // 첫 5개 슬롯에만 test 아이템 추가
+                if (row === 0 && col < items.length) {
+                    const item = this.add.sprite(0, 0, items[col])
+                        .setScale(1)
+                        .setOrigin(0.5);
+                    
+                    // 처음 3개 아이템에 대해서만 애니메이션 적용
+                    if (col < 3) {
+                        item.play(`${items[col]}_anim`).setScale(1.5);
+                    }
+                    
+                    slotContainer.add(item);
+                }
+                
+                inventoryContainer.add(slotContainer);
+            }
+        }
+        
+        inventoryContainer.add([inventorySelect, inventoryBorder]);
+        
+        // 인벤토리 컨테이너 스케일 설정
+        inventoryContainer.setScale(this.currentScale + 0.5);
+        
+        // 인벤토리 컨테이너를 레지스터박스 하단에 고정
+        const inventoryY = registerBox.displayHeight / 2 - (inventoryContainer.height * (this.currentScale + 0.5)) / 2;
+        inventoryContainer.setPosition(0, inventoryY);
+        characterStateContainer.setPosition(0, inventoryContainer.height + 20);
         const registerContainer = this.add.container(this.cameras.main.centerX, this.cameras.main.centerY,[
             registerBox,
             exitBtn,
             resizeHandle,
             characterContainer,
-            characterNameContainer
+            characterNameContainer,
+            inventoryContainer,
+            characterStateContainer
         ]);
 
         registerBox.setInteractive();
@@ -273,14 +468,13 @@ export default class RegisterBox extends Scene {
                 );
 
                 characterContainer.setPosition(
-                    0, // x 좌표를 0으로 유지하여 중앙 정렬 유지
+                    0,
                     -registerBox.displayHeight/2 + 70 + this.padding
                 );
 
-                // 캐릭터 이름 컨테이너 위치 업데이트 - 중앙 정렬 유지
                 characterNameContainer.setPosition(
                     0,
-                    characterContainer.y + characterImage.displayHeight - 50
+                    characterContainer.y + characterImage.displayHeight - 40
                 );
 
                 // 캐릭터 이름 컨테이너 스케일 조정
@@ -288,6 +482,12 @@ export default class RegisterBox extends Scene {
                 nameInput.setScale(this.currentScale+1);
                 displayedText.setScale(this.currentScale);
                 warningText.setScale(this.currentScale);
+
+                // 인벤토리 컨테이너 전체 스케일 조정
+                inventoryContainer.setScale(this.currentScale+0.5);
+
+                // 캐릭터 스테이트 컨테이너 스케일 조정
+                characterStateContainer.setScale(this.currentScale + 0.1);
 
                 drawResizeHandle(0x0000ff, 3);
                 
@@ -319,5 +519,30 @@ export default class RegisterBox extends Scene {
                 }
             }
         });
+    }
+
+
+    update() {
+        // 브라우저 창 크기가 변경되었는지 확인
+        const currentWidth = window.innerWidth;
+        const currentHeight = window.innerHeight;
+        
+        if (this.lastWidth !== currentWidth || this.lastHeight !== currentHeight) {
+            // 현재 크기 저장
+            this.lastWidth = currentWidth;
+            this.lastHeight = currentHeight;
+            
+            // 기존 컨테이너 제거
+            this.children.removeAll(true);
+            
+            // 게임 캔버스 크기 조정
+            this.scale.resize(currentWidth, currentHeight);
+            
+            // 카메라 뷰포트 업데이트 
+            this.cameras.main.setViewport(0, 0, currentWidth, currentHeight);
+            
+            // 새로운 컨테이너 생성
+            this.createRegisterContainer();
+        }
     }
 }
