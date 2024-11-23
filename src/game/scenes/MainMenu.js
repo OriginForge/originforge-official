@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { EventBus } from '../EventBus';
 
+
 export default class MainMenu extends Scene
 {
     constructor ()
@@ -8,20 +9,20 @@ export default class MainMenu extends Scene
         super('MainMenu');
     }
 
-    preload ()
-    {
-        
-    }
-
     create ()
-    {    
+    {
+        // 배경 설정
         const background = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
         background.setScale(this.cameras.main.width / background.width, this.cameras.main.height / background.height);
-           
-        const text = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Game', { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
-        
-        EventBus.emit('current-scene-ready', this);
 
-        this.scene.start('CustomCharacter');
+        // 씬 준비 완료 이벤트
+        EventBus.emit('current-scene-ready', this);    
+
+        this.scene.start('RegisterBox');
     }
+
+    
+
 }
+
+

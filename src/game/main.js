@@ -1,6 +1,6 @@
 import PreLoad from './scenes/PreLoad';
 import MainMenu from './scenes/MainMenu';
-import Register from './scenes/Register';
+import RegisterBox from './components/RegisterBox';
 import Phaser from 'phaser';
 
 //  Find out more information about the Game Config at:
@@ -19,7 +19,7 @@ const config = {
     scene: [
         PreLoad,
         MainMenu,
-        Register
+        RegisterBox
     ]
 };
 
