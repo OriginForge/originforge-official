@@ -1,7 +1,20 @@
 import { useAppKitAccount } from '@reown/appkit/react';
+import { useEffect } from 'react';
+import { gameData } from '../game/managers/GameDataManager';
 
 export default function Header() {
     const { address, caipAddress, isConnected, status  } = useAppKitAccount();
+
+    useEffect(() => {
+        if (isConnected&&address) {
+            gameData.setWalletAddress(address);
+            
+        }
+    }, [isConnected, address]);
+
+    
+
+    
  return(    
     <header className="main-header">
         <div className="header-left">

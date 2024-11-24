@@ -1,9 +1,11 @@
 import { Scene } from 'phaser';
 import { EventBus } from '../EventBus';
-
+import { gameData} from '../managers/GameDataManager';
 export default class RegisterBox extends Scene {
     constructor() {
         super('RegisterBox');
+        // blockchain user datas
+        this.gameData = gameData;
         this.isDragging = false;
         this.isResizing = false;
         this.dragStartPos = { x: 0, y: 0 };
@@ -19,15 +21,29 @@ export default class RegisterBox extends Scene {
     }
 
     create() {
+        EventBus.on('wallet-connected', this.handleWalletConnect, this);
+        EventBus.on('player-data-updated', this.handlePlayerDataUpdate, this);
+
         this.createItemAnimations();
         this.createRegisterContainer();
+    }
+
+    // 
+    handleWalletConnect(){
+        console.log('wallet-connected');
+        
+    }
+
+    handlePlayerDataUpdate() {
+        console.log('player-data-updated');
+        // axios get player data
     }
 
     createItemAnimations() {
                 // item1 애니메이션
                 this.anims.create({
                     key: 'item1_anim',
-                    frames: this.anims.generateFrameNumbers('item1', { start: 0, end: 8 }),
+                    frames: this.anims.generateFrameNumbers('item1', { start: 0, end: -1 }),
                     frameRate: 8,
                     repeat: -1
                 });
@@ -35,7 +51,7 @@ export default class RegisterBox extends Scene {
                 // item2 애니메이션
                 this.anims.create({
                     key: 'item2_anim',
-                    frames: this.anims.generateFrameNumbers('item2', { start: 0, end: 8 }),
+                    frames: this.anims.generateFrameNumbers('item2', { start: 0, end: -1 }),
                     frameRate: 8,
                     repeat: -1
                 });
@@ -43,7 +59,7 @@ export default class RegisterBox extends Scene {
                 // item3 애니메이션
                 this.anims.create({
                     key: 'item3_anim',
-                    frames: this.anims.generateFrameNumbers('item3', { start: 0, end: 8 }),
+                    frames: this.anims.generateFrameNumbers('item3', { start: 0, end: -1 }),
                     frameRate: 8,
                     repeat: -1
                 });
@@ -544,5 +560,11 @@ export default class RegisterBox extends Scene {
             // 새로운 컨테이너 생성
             this.createRegisterContainer();
         }
+    }
+
+    destroy() {
+        EventBus.off('wallet-connected', this.handleWalletConnect, this);
+        EventBus.off('player-data-updated', this.handlePlayerDataUpdate, this);
+        super.destroy();
     }
 }
