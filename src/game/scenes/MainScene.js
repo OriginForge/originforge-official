@@ -42,7 +42,7 @@ export default class MainMenu extends Scene {
         this.spawnArea = this.calculateSpawnArea();
 
         EventBus.emit('current-scene-ready', this);    
-
+        
         this.createBackgroundAnimation();
         this.createPlanetAnimation();        
 
@@ -176,8 +176,9 @@ export default class MainMenu extends Scene {
                     ease: 'Cubic.easeOut'
                 });
                 
-                nodePlanet.removeInteractive();
+                // nodePlanet.removeInteractive();
                 this.scene.launch('RegisterBox');
+                
             })
             .on('pointerover', () => {
                 this.tweens.add({
@@ -275,6 +276,8 @@ export default class MainMenu extends Scene {
         this.stars = starPool;
         this.dusts = dustPool;
     }
+
+    
 
     destroy() {
         this.cleanupAnimations();

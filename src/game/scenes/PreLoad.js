@@ -60,7 +60,8 @@ export default class PreLoad extends Scene
         this.load.image('background', 'bg.png');
         this.load.image('registerBox_bg', 'registerBox_bg.png');
         // modal Box
-        this.load.image('modalBox_bg', 'modalBox_bg.png');
+        this.load.image('modalBox_bg', 'modalBox_bg2.png');
+        
         this.load.image('exitBtn', 'exitBtn.png');
         this.load.image('prev_exitBtn', 'prev_exitBtn.png');
         this.load.image('characterBox', 'characterBox.png');

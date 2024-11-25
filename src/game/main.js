@@ -24,17 +24,6 @@ const config = {
         MainMenu,
         RegisterBox,
     ],
-    // plugins: {
-    //     global: [NineSlicePlugin],
-    //     scene: [
-    //         {
-    //           key: "DialogModal",
-    //           plugin: DialogModal,
-    //           start: false,
-    //           mapping: "dialog"
-    //         }
-    //     ]
-    // }
 };
 
 const StartGame = (parent) => {

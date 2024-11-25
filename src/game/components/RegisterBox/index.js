@@ -36,7 +36,7 @@ export default class RegisterBox extends Scene {
     createRegisterContainer() {
         const registerBox = this.add.image(0, 0, 'modalBox_bg')
             .setScale(this.currentScale);
-
+        
         const exitBtn = createExitButton(this, registerBox, this.padding);
         const characterSection = createCharacterSection(this, registerBox);
         const characterNameSection = createCharacterNameSection(
@@ -99,6 +99,9 @@ export default class RegisterBox extends Scene {
         EventBus.off('wallet-connected', this.handleWalletConnect, this);
         EventBus.off('player-data-updated', this.handlePlayerDataUpdate, this);
         this.scene.stop(this.scene.key);
+        
+
+
     
     }
 }
