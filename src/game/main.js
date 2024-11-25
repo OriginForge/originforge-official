@@ -1,7 +1,9 @@
 import PreLoad from './scenes/PreLoad';
-import MainMenu from './scenes/MainMenu';
-// import RegisterBox from './components/RegisterBox';
+import MainMenu from './scenes/MainScene';
+
+
 import RegisterBox from './components/RegisterBox/index';
+
 import Phaser from 'phaser';
 
 //  Find out more information about the Game Config at:
@@ -20,8 +22,19 @@ const config = {
     scene: [
         PreLoad,
         MainMenu,
-        RegisterBox
-    ]
+        RegisterBox,
+    ],
+    // plugins: {
+    //     global: [NineSlicePlugin],
+    //     scene: [
+    //         {
+    //           key: "DialogModal",
+    //           plugin: DialogModal,
+    //           start: false,
+    //           mapping: "dialog"
+    //         }
+    //     ]
+    // }
 };
 
 const StartGame = (parent) => {

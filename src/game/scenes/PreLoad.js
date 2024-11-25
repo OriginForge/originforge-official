@@ -10,7 +10,48 @@ export default class PreLoad extends Scene
     }
 
     init() {
-        this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Loading...', { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
+        // 로딩 텍스트 생성
+        const loadingText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Loading  ', {
+            fontFamily: 'Pixelify Sans',
+            fontSize: '32px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+
+        // 픽셀 스타일의 로딩 도트 생성
+        const dots = [];
+        for (let i = 0; i < 3; i++) {
+            const dot = this.add.rectangle(
+                loadingText.x + 60 + (i * 15), 
+                loadingText.y,
+                8, 
+                8,
+                0xffffff
+            ).setOrigin(0.5);
+            dots.push(dot);
+        }
+
+        // 도트 애니메이션
+        dots.forEach((dot, index) => {
+            this.tweens.add({
+                targets: dot,
+                alpha: 0,
+                duration: 600,
+                ease: 'Power2',
+                yoyo: true,
+                repeat: -1,
+                delay: index * 200
+            });
+        });
+
+        // 로딩 텍스트 깜빡임 효과
+        this.tweens.add({
+            targets: loadingText,
+            alpha: 0.5,
+            duration: 1000,
+            ease: 'Power2',
+            yoyo: true,
+            repeat: -1
+        });
     }
     
     preload ()
@@ -51,8 +92,10 @@ export default class PreLoad extends Scene
         this.load.spritesheet('nodePlanet', 'nodePlanet.png', { frameWidth: 128, frameHeight: 128 });
         this.load.spritesheet('blackHole', 'blackHole.png', { frameWidth: 256, frameHeight: 256 });
 
-    
+
         
+        // this.load.atlas('ui', 'nine-slice.png', 'nine-slice.json');
+        this.load.image('dialog_box', 'Card X5.png');   
     }
 
 
@@ -87,6 +130,34 @@ export default class PreLoad extends Scene
             frameRate: 8,
             repeat: -1
         })
+
+        this.anims.create({
+            key: 'earthPlanet_anim',
+            frames: this.anims.generateFrameNumbers('earthPlanet', { start: 0, end: -1 }),
+            frameRate: 13,
+            repeat: -1,
+            yoyo: false,
+            duration: 5000
+        })
+
+        this.anims.create({
+            key: 'nodePlanet_anim',
+            frames: this.anims.generateFrameNumbers('nodePlanet', { start: 0, end: -1 }),
+            frameRate: 5,
+            repeat: -1,
+            yoyo: false,
+            duration: 5000
+        })
+
+        this.anims.create({
+            key: 'blackHole_anim',
+            frames: this.anims.generateFrameNumbers('blackHole', { start: 0, end: -1 }),
+            frameRate: 13,
+            repeat: -1,
+            yoyo: false,
+            duration: 5000
+        })
+
     }
 
     
