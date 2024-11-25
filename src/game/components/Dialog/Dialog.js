@@ -20,6 +20,7 @@ export default class Dialog {
         this.dragStartY = 0;
         this.maskGraphics = null;
         this.resizeListener = null;
+        this.exitButton = null;
     }
 
     show(options = {}) {
@@ -69,6 +70,35 @@ export default class Dialog {
             .setDisplaySize(panelWidth, panelHeight)
             .setDepth(1)
             .setInteractive();
+
+        // 닫기 버튼 생성
+        this.exitButton = this.scene.add.image(
+            panelX + (panelWidth/2) - 30,
+            panelY - (panelHeight/2) - 20,
+            'prev_exitBtn'
+        )
+            .setScale(1.5)
+            .setDepth(2)
+            .setInteractive();
+
+        // 닫기 버튼 이벤트
+        this.exitButton
+            .on('pointerover', () => {
+                this.exitButton.setTexture('exitBtn');
+                this.exitButton.setScale(1.6);
+            })
+            .on('pointerout', () => {
+                this.exitButton.setTexture('prev_exitBtn');
+                this.exitButton.setScale(1.5);
+            })
+            .on('pointerdown', () => {
+                this.exitButton.setTexture('exitBtn');
+                this.exitButton.setScale(1.4);
+            })
+            .on('pointerup', () => {
+                this.exitButton.setScale(1.5);
+                this.destroy();
+            });
 
         // 패널 애니메이션 시작
         this.scene.tweens.add({
@@ -125,6 +155,14 @@ export default class Dialog {
         // 패널 위치 및 크기 업데이트
         this.panel.setPosition(panelX, panelY)
             .setDisplaySize(panelWidth, panelHeight);
+
+        // 닫기 버튼 위치 업데이트
+        if (this.exitButton) {
+            this.exitButton.setPosition(
+                panelX + (panelWidth/2) - 30,
+                panelY - (panelHeight/2) + 30
+            );
+        }
 
         // 마스크 업데이트
         this.updateMask(panelX, panelY, panelWidth, panelHeight);
@@ -273,6 +311,10 @@ export default class Dialog {
 
         if (this.maskGraphics) {
             this.maskGraphics.destroy();
+        }
+
+        if (this.exitButton) {
+            this.exitButton.destroy();
         }
     }
 }
