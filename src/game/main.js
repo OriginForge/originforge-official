@@ -1,6 +1,7 @@
 import PreLoad from './scenes/PreLoad';
 import MainMenu from './scenes/MainMenu';
-import RegisterBox from './components/RegisterBox';
+// import RegisterBox from './components/RegisterBox';
+import RegisterBox from './components/RegisterBox/index';
 import Phaser from 'phaser';
 
 //  Find out more information about the Game Config at:

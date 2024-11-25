@@ -12,7 +12,7 @@ export default class PreLoad extends Scene
     init() {
         this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Loading...', { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
     }
-
+    
     preload ()
     {
         this.load.setPath('assets');
@@ -51,46 +51,43 @@ export default class PreLoad extends Scene
         this.load.spritesheet('nodePlanet', 'nodePlanet.png', { frameWidth: 128, frameHeight: 128 });
         this.load.spritesheet('blackHole', 'blackHole.png', { frameWidth: 256, frameHeight: 256 });
 
-        // this.createItemAnimations();
+    
         
     }
 
+
     create ()
     {    
-        // loading screen
-
+        this.createAnimations();
 
         EventBus.emit('current-scene-ready', this);
         this.scene.start('MainMenu');
-
-
     }
 
-    // createItemAnimations() {
-    //     // item1 애니메이션
-    //     this.anims.create({
-    //         key: 'item1_anim',
-    //         frames: this.anims.generateFrameNumbers('item1', { start: 0, end: 8 }),
-    //         frameRate: 8,
-    //         repeat: -1
-    //     });
-
-    //     // item2 애니메이션
-    //     this.anims.create({
-    //         key: 'item2_anim',
-    //         frames: this.anims.generateFrameNumbers('item2', { start: 0, end: 8 }),
-    //         frameRate: 8,
-    //         repeat: -1
-    //     });
-
-    //     // item3 애니메이션
-    //     this.anims.create({
-    //         key: 'item3_anim',
-    //         frames: this.anims.generateFrameNumbers('item3', { start: 0, end: 8 }),
-    //         frameRate: 8,
-    //         repeat: -1
-    //     });
-    // }
     
+    createAnimations() {
 
+        this.anims.create({
+            key: 'item1_anim',
+            frames: this.anims.generateFrameNumbers('item1', { start: 0, end: -1 }),
+            frameRate: 8,
+            repeat: -1
+        });
+        
+        this.anims.create({
+            key: 'item2_anim',
+            frames: this.anims.generateFrameNumbers('item2', { start: 0, end: -1 }),
+            frameRate: 8,
+            repeat: -1
+        })
+        
+        this.anims.create({
+            key: 'item3_anim',
+            frames: this.anims.generateFrameNumbers('item3', { start: 0, end: -1 }),
+            frameRate: 8,
+            repeat: -1
+        })
+    }
+
+    
 }

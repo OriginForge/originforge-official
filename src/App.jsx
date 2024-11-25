@@ -12,12 +12,12 @@ function App ({isMobile}){
 
     const phaserRef = useRef();
 
-    useEffect(() => {
-        if(isMobile){
-            connect({connector: injected()})
-        }
-        return;
-    }, [isMobile])
+    // useEffect(() => {
+    //     if(isMobile){
+    //         connect({connector: injected()})
+    //     }
+    //     return;
+    // }, [isMobile])
 
     return (
         <Router>
