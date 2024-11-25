@@ -18,11 +18,12 @@ export default class MainMenu extends Scene
         // 씬 준비 완료 이벤트
         EventBus.emit('current-scene-ready', this);    
 
-        this.scene.start('RegisterBox');
+        // RegisterBox 씬을 현재 씬 위에 오픈
+        this.add.text(100, 100, 'RegisterBox', { fontSize: '32px', fill: '#FFF' })
     }
 
-    
 
+    openRegisterBox() {
+        this.scene.launch('RegisterBox');
+    }
 }
-
-

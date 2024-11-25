@@ -97,6 +97,7 @@ export default class RegisterBox extends Scene {
     destroy() {
         EventBus.off('wallet-connected', this.handleWalletConnect, this);
         EventBus.off('player-data-updated', this.handlePlayerDataUpdate, this);
+        this.scene.stop(this.scene.key);
         super.destroy();
     }
 }

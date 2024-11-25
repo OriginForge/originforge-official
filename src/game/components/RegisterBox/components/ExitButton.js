@@ -20,6 +20,7 @@ export function createExitButton(scene, registerBox, padding = 0) {
         })
         .on('pointerup', () => {
             exitBtn.setScale(1.5);
+            scene.destroy();
             scene.scene.start('MainMenu');
         });
 
