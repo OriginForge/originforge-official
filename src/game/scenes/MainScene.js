@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { EventBus } from '../EventBus';
 import Dialog from '../components/Dialog/Dialog';
 
+
 export default class MainMenu extends Scene {
     constructor() {
         super('MainMenu');
@@ -13,6 +14,7 @@ export default class MainMenu extends Scene {
         this.isAnimating = false;
         this.lastGameSize = null; // 마지막 게임 사이즈 저장
         this.planetContainer = null; // 행성 컨테이너 추가
+        this.imageGenerator = null;
     }
 
     init() {
@@ -35,10 +37,12 @@ export default class MainMenu extends Scene {
         };
     }
 
+    preload() {
+    }
     create() {
         this.background = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
         this.updateBackgroundScale();
-        
+        this.crateRandomGenButton()        
         this.spawnArea = this.calculateSpawnArea();
 
         EventBus.emit('current-scene-ready', this);    
@@ -67,6 +71,8 @@ export default class MainMenu extends Scene {
         });
         
         this.scale.on('resize', this.handleResize, this);
+
+        
     }
 
     calculateSpawnArea() {
@@ -277,8 +283,73 @@ export default class MainMenu extends Scene {
         this.dusts = dustPool;
     }
 
-    
+    async generateRandomEgg() {
+        try {
+            // 샘플 이미지 가져오기
+            const imageFile = this.textures.get('egg_sample').getSourceImage();
+            
+            // 이미지 생성
+            const { canvas, seed } = await this.imageGenerator.processImage(imageFile);
+            
+            // 결과 텍스처 생성
+            const texture = this.textures.createCanvas('generated_egg', canvas.width, canvas.height);
+            texture.draw(0, 0, canvas);
+            texture.refresh();
 
+            // 결과 이미지 표시
+            const sprite = this.add.sprite(400, 200, 'generated_egg')
+                .setScale(4); // 16x16 이미지를 4배 확대
+
+            // 시드 값 표시
+            this.add.text(400, 400, `Seed: ${seed}`, {
+                fontSize: '18px',
+                fill: '#fff'
+            }).setOrigin(0.5);
+
+            // 이미지 저장 버튼
+            const saveButton = this.add.text(400, 450, 'Save Image', {
+                fontSize: '20px',
+                fill: '#fff',
+                backgroundColor: '#4a4a4a',
+                padding: { x: 10, y: 5 }
+            })
+                .setOrigin(0.5)
+                .setInteractive();
+
+            saveButton.on('pointerdown', () => {
+                const sizes = [16, 32, 64];
+                sizes.forEach(size => {
+                    const resizedCanvas = document.createElement('canvas');
+                    resizedCanvas.width = size;
+                    resizedCanvas.height = size;
+                    const ctx = resizedCanvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = false;
+                    ctx.drawImage(canvas, 0, 0, size, size);
+                    
+                    const link = document.createElement('a');
+                    link.download = `random_egg_${size}x${size}_${seed}.png`;
+                    link.href = resizedCanvas.toDataURL('image/png');
+                    link.click();
+                });
+            });
+
+        } catch (error) {
+            console.error('Failed to generate egg:', error);
+        }
+    }
+
+    crateRandomGenButton() {
+        this.randomGenButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY/2, 'Generate Random Egg', {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: '#4a4a4a',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive()
+        .on('pointerdown', () => {
+            this.scene.launch('RandomGenerator');
+        });
+        
+    }
     destroy() {
         this.cleanupAnimations();
         this.scale.off('resize', this.handleResize, this);

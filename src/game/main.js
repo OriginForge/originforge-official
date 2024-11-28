@@ -1,10 +1,8 @@
+import Phaser from 'phaser';
 import PreLoad from './scenes/PreLoad';
 import MainMenu from './scenes/MainScene';
-
-
 import RegisterBox from './components/RegisterBox/index';
-
-import Phaser from 'phaser';
+import RandomGenerator from './components/RandomGenerator/index';
 
 //  Find out more information about the Game Config at:
 //  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
@@ -23,6 +21,7 @@ const config = {
         PreLoad,
         MainMenu,
         RegisterBox,
+        RandomGenerator,
     ],
 };
 
