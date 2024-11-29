@@ -401,23 +401,26 @@ export default class MainMenu extends Scene {
             });
 
             try {
-                // const response = await axios.get('http://localhost:3000/isUser', {
-                //     params: {
-                //         walletAddress: walletAddress
-                //     }
-                // })
+                const response = await axios.get('http://localhost:3000/isUser', {
+                    params: {
+                        walletAddress: walletAddress
+                    }
+                })
 
-                setTimeout(() => {
-                    // 타이머 정지
+                
+                if(response.data.isUser) {
+                    alert('User is registered');
+                        
+                    this.input.enabled = true;
+                } else {
+                    alert('User is not registered');
+                }
                     dotTimer.destroy();
-                    // 로딩 텍스트와 오버레이 제거
                     loadingText.destroy();
                     darkOverlay.destroy();
-                    // 상호작용 다시 활성화
-                    this.input.enabled = true;
-                }, 2000);
                 
-                // 응답 처리
+                    this.input.enabled = true;
+                
                 
             } catch (error) {
                 // 타이머 정지
