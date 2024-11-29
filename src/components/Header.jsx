@@ -1,4 +1,5 @@
-import { useAppKitAccount } from '@reown/appkit/react';
+import { useAppKitAccount, useAppKit,useWalletInfo } from '@reown/appkit/react';
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gameData } from '../game/managers/GameDataManager';
@@ -8,9 +9,10 @@ import { Menu, Home, Info, Gamepad2, Wallet } from 'lucide-react';
 
 export default function Header() {
     const { address, isConnected } = useAppKitAccount();
+    const {walletInfo} = useWalletInfo();
     const isMobile = useMediaQuery({ maxWidth: 768 });
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+    const {open,close} = useAppKit();
     const logoSize = isMobile ? 'h-5 w-5' : 'h-7 w-7';
     const titleSize = isMobile ? 'text-2xl' : 'text-3xl';
 
@@ -18,7 +20,18 @@ export default function Header() {
         if (isConnected && address) {
             gameData.setWalletAddress(address);
         }
+        if(!isConnected) {
+            gameData.setWalletAddress(null);
+        }
     }, [isConnected, address]);
+
+    const handleWalletClick = () => {
+        if (isConnected) {
+            open({ view: 'Account' })();
+        } else {
+            open()();
+        }
+    };
 
     return (    
         <header className="sticky top-0 z-50 w-full border-b bg-black/80 backdrop-blur">
@@ -50,21 +63,17 @@ export default function Header() {
                     )}
                     
                     <div className="flex items-center space-x-4">
-                        {/* Connect Wallet 버튼 주석 처리
                         <button 
-                            className={`flex items-center gap-2 rounded-md px-4 py-2 ${
-                                isConnected 
-                                    ? 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                            }`}
+                            onClick={handleWalletClick}
+                            className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 transition-colors duration-200 
+                                     border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white"
                         >
-                            <Wallet size={16} />
+                            <Wallet size={16} color={isConnected ? "#BFF009" : "#9CA3AF"} />
                             {isConnected 
-                                ? `${address?.slice(0,6)}...${address?.slice(-4)}`
-                                : 'Connect Wallet'
+                                ? `${address?.slice(0,4)}...${address?.slice(-4)}`
+                                : 'Connect'
                             }
                         </button>
-                        */}
                         
                         {isMobile && (
                             <button 

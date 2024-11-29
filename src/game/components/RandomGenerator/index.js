@@ -1,6 +1,7 @@
 import { Scene } from "phaser";
 import { ImageProcessor } from './ImageProcessor';
 import { SeededRandom } from './SeededRandom';
+import axios from 'axios';
 
 export default class RandomGenerator extends Scene {
     constructor() {
@@ -25,8 +26,9 @@ export default class RandomGenerator extends Scene {
         this.imageProcessor = new ImageProcessor({
             seed: this.currentSeed,
             excludeColors: [
-                {color: [255, 255, 255], tolerance: 3},
-                {color: [57, 57, 70], tolerance: 2}
+                {color: [255, 255, 255], tolerance: 3}, // #FFFFFF
+                {color: [57, 57, 70], tolerance: 2},
+                {color: [0, 0, 0], tolerance: 3} // #000000
             ]
         });
 
@@ -116,7 +118,6 @@ export default class RandomGenerator extends Scene {
             const seed = parseInt(seedInput);
             const baseImage = `egg${baseEggInput}`;
 
-            // 새로운 테스트 박스 생성
             const testBox = this.add.rectangle(
                 this.cameras.main.centerX + 350, 
                 this.cameras.main.centerY/2, 
@@ -124,13 +125,11 @@ export default class RandomGenerator extends Scene {
                 0x1a1a1a, 0.9
             ).setStrokeStyle(2, 0x4a90e2);
 
-            // 테스트 컨테이너 생성
             const testContainer = this.add.container(
                 this.cameras.main.centerX + 350,
                 this.cameras.main.centerY/2
             );
 
-            // 이전 테스트 이미지가 있다면 제거
             if (this.testImage) {
                 this.testImage.destroy();
                 this.textures.remove(`test_${this.currentSeed}`);
@@ -149,38 +148,65 @@ export default class RandomGenerator extends Scene {
             texture.draw(0, 0, canvas);
             texture.refresh();
 
-            // 테스트 이미지 생성 및 컨테이너에 추가
             this.testImage = this.add.image(0, -20, testTextureKey).setScale(4);
             testContainer.add(this.testImage);
 
-            // 테스트 정보 텍스트 추가
             const testText = this.add.text(0, 40, '', { 
                 fontSize: '16px', 
                 fill: '#fff' 
             }).setOrigin(0.5);
             
-            const colorInfo = colorSet.map(color => color.hex).join(', ');
+            const filteredColors = colorSet.filter(color => 
+                color.hex.toUpperCase() !== '#000000' && 
+                color.hex.toUpperCase() !== '#FFFFFF'
+            );
+            
+            const colorInfo = filteredColors.map(color => color.hex).join(', ');
             testText.setText(
                 `Test Render\nSeed: ${seed}\nBase: ${baseImage}\nColors: ${colorInfo}`
             ).setLineSpacing(5);
             
             testContainer.add(testText);
 
-            // metadata 생성 및 출력
+            // Convert canvas to high quality SVG data URL
+            const highResCanvas = document.createElement('canvas');
+            highResCanvas.width = 64;
+            highResCanvas.height = 64;
+            const ctx = highResCanvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(canvas, 0, 0, 64, 64);
+
+            const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" shape-rendering="crispEdges">
+                <image width="100%" height="100%" href="${highResCanvas.toDataURL('image/png', 1.0)}"/>
+            </svg>`;
+            const svgBase64 = btoa(svgString);
+            const svgDataUrl = `data:image/svg+xml;base64,${svgBase64}`;
+
+            // Generate random attributes
+            const attributes = [
+                {
+                    "trait_type": "BaseEgg", 
+                    "value": baseEggInput
+                },
+                {
+                    "trait_type": "Seed",
+                    "value": seed
+                },
+                {
+                    "trait_type": "Colors",
+                    "value": filteredColors.length
+                },
+                {
+                    "trait_type": "ColorSet",
+                    "value": filteredColors.map(color => color.hex).join(', ')
+                },
+            ];
+
             const metadata = {
-                description: "Origin-Forge SBT",
-                image: canvas.toDataURL(),
-                name: `Seed: ${seed}`,
-                attributes: [
-                    {
-                        trait_type: "Base Pattern",
-                        value: baseImage
-                    },
-                    ...colorSet.map(color => ({
-                        trait_type: "Color",
-                        value: color.hex
-                    }))
-                ]
+                name: "OpenSea Creatures",
+                description: "OpenSea Creatures are adorable aquatic beings primarily for demonstrating what can be done using the OpenSea platform. Adopt one today to try out all the OpenSea buying, selling, and bidding feature set.",
+                image: svgDataUrl,
+                attributes: attributes
             };
 
             const jsonString = JSON.stringify(metadata);
@@ -215,20 +241,51 @@ export default class RandomGenerator extends Scene {
             texture.draw(0, 0, canvas);
             texture.refresh();
 
+            // Convert canvas to high quality SVG data URL
+            const highResCanvas = document.createElement('canvas');
+            highResCanvas.width = 64;
+            highResCanvas.height = 64;
+            const ctx = highResCanvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(canvas, 0, 0, 64, 64);
+
+            const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" shape-rendering="crispEdges">
+                <image width="100%" height="100%" href="${highResCanvas.toDataURL('image/png', 1.0)}"/>
+            </svg>`;
+            const svgBase64 = btoa(svgString);
+            const svgDataUrl = `data:image/svg+xml;base64,${svgBase64}`;
+
+            // Generate attributes based on the generated image
+            const baseNumber = parseInt(baseImage.replace('egg', ''));
+            const filteredColors = colorSet.filter(color => 
+                color.hex.toUpperCase() !== '#000000' && 
+                color.hex.toUpperCase() !== '#FFFFFF'
+            );
+            
+            const attributes = [
+                {
+                    "trait_type": "BaseEgg", 
+                    "value": baseNumber
+                },
+                {
+                    "trait_type": "Seed",
+                    "value": seed
+                },
+                {
+                    "trait_type": "Colors",
+                    "value": filteredColors.length
+                },
+                {
+                    "trait_type": "ColorSet",
+                    "value": filteredColors.map(color => color.hex).join(', ')
+                },
+            ];
+
             const metadata = {
-                description: "Origin-Forge SBT",
-                image: canvas.toDataURL(),
-                name: `Seed: ${seed}`,
-                attributes: [
-                    {
-                        trait_type: "Base Pattern",
-                        value: baseImage
-                    },
-                    ...colorSet.map(color => ({
-                        trait_type: "Color",
-                        value: color.hex
-                    }))
-                ]
+                name: "Origin Egg",
+                description: "Origin Egg is a collection of 50 unique eggs, each with a different pattern and color set.",
+                image: svgDataUrl,
+                attributes: attributes
             };
 
             const jsonString = JSON.stringify(metadata);
@@ -239,7 +296,7 @@ export default class RandomGenerator extends Scene {
 
             this.eggImage.setTexture(textureKey);
             
-            const colorInfo = colorSet.map(color => color.hex).join(', ');
+            const colorInfo = filteredColors.map(color => color.hex).join(', ');
             this.seedText.setText(
                 `Seed: ${seed}\nBase: ${baseImage}\nColors: ${colorInfo}`
             ).setLineSpacing(5);
@@ -248,15 +305,16 @@ export default class RandomGenerator extends Scene {
                 this.seedHistory.push(seed);
             }
 
-            this.usedColors = colorSet;
+            this.usedColors = filteredColors;
 
             this.lastGeneratedImage = {
                 seed,
                 baseImage,
                 textureKey,
-                colorSet
+                colorSet: filteredColors
             };
 
+            
         } catch (error) {
             console.error('Generation failed:', error);
             this.seedText.setText(`Generation failed: ${error.message}`);
@@ -277,13 +335,20 @@ export default class RandomGenerator extends Scene {
 
         const { seed, baseImage, colorSet: originalColors } = this.lastGeneratedData;
         
-        // 동일한 시드와 베이스 이미지로 새로 생성
         const imageFile = this.textures.get(baseImage)?.getSourceImage();
         this.imageProcessor.setSeed(seed);
         const { colorSet: newColors } = await this.imageProcessor.processImage(imageFile);
 
-        // 결과 비교
-        const isIdentical = JSON.stringify(originalColors) === JSON.stringify(newColors);
+        const filteredOriginalColors = originalColors.filter(color => 
+            color.hex.toUpperCase() !== '#000000' && 
+            color.hex.toUpperCase() !== '#FFFFFF'
+        );
+        const filteredNewColors = newColors.filter(color => 
+            color.hex.toUpperCase() !== '#000000' && 
+            color.hex.toUpperCase() !== '#FFFFFF'
+        );
+
+        const isIdentical = JSON.stringify(filteredOriginalColors) === JSON.stringify(filteredNewColors);
         
         this.seedText.setText(
             `Verification Result:\n` +

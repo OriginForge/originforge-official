@@ -1,8 +1,8 @@
 import { Scene } from 'phaser';
 import { EventBus } from '../EventBus';
 import Dialog from '../components/Dialog/Dialog';
-
-
+import {gameData} from '../managers/GameDataManager';
+import axios from 'axios';
 export default class MainMenu extends Scene {
     constructor() {
         super('MainMenu');
@@ -42,14 +42,15 @@ export default class MainMenu extends Scene {
     create() {
         this.background = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
         this.updateBackgroundScale();
-        this.crateRandomGenButton()        
+        // 잠시 주석
+        // this.crateRandomGenButton()        
         this.spawnArea = this.calculateSpawnArea();
 
         EventBus.emit('current-scene-ready', this);    
         
         this.createBackgroundAnimation();
         this.createPlanetAnimation();        
-
+    
         const dialog = new Dialog(this);
         dialog.show({
             content: [
@@ -74,6 +75,7 @@ export default class MainMenu extends Scene {
 
         
     }
+    
 
     calculateSpawnArea() {
         return {
@@ -183,7 +185,8 @@ export default class MainMenu extends Scene {
                 });
                 
                 // nodePlanet.removeInteractive();
-                this.scene.launch('RegisterBox');
+                // this.scene.launch('RegisterBox');
+                this.checkWallet();
                 
             })
             .on('pointerover', () => {
@@ -283,73 +286,154 @@ export default class MainMenu extends Scene {
         this.dusts = dustPool;
     }
 
-    async generateRandomEgg() {
-        try {
-            // 샘플 이미지 가져오기
-            const imageFile = this.textures.get('egg_sample').getSourceImage();
+    // 잠시 주석
+    // async generateRandomEgg() {
+    //     try {
+    //         // 샘플 이미지 가져오기
+    //         const imageFile = this.textures.get('egg_sample').getSourceImage();
             
-            // 이미지 생성
-            const { canvas, seed } = await this.imageGenerator.processImage(imageFile);
+    //         // 이미지 생성
+    //         const { canvas, seed } = await this.imageGenerator.processImage(imageFile);
             
-            // 결과 텍스처 생성
-            const texture = this.textures.createCanvas('generated_egg', canvas.width, canvas.height);
-            texture.draw(0, 0, canvas);
-            texture.refresh();
+    //         // 결과 텍스처 생성
+    //         const texture = this.textures.createCanvas('generated_egg', canvas.width, canvas.height);
+    //         texture.draw(0, 0, canvas);
+    //         texture.refresh();
 
-            // 결과 이미지 표시
-            const sprite = this.add.sprite(400, 200, 'generated_egg')
-                .setScale(4); // 16x16 이미지를 4배 확대
+    //         // 결과 이미지 표시
+    //         const sprite = this.add.sprite(400, 200, 'generated_egg')
+    //             .setScale(4); // 16x16 이미지를 4배 확대
 
-            // 시드 값 표시
-            this.add.text(400, 400, `Seed: ${seed}`, {
-                fontSize: '18px',
-                fill: '#fff'
-            }).setOrigin(0.5);
+    //         // 시드 값 표시
+    //         this.add.text(400, 400, `Seed: ${seed}`, {
+    //             fontSize: '18px',
+    //             fill: '#fff'
+    //         }).setOrigin(0.5);
 
-            // 이미지 저장 버튼
-            const saveButton = this.add.text(400, 450, 'Save Image', {
-                fontSize: '20px',
-                fill: '#fff',
-                backgroundColor: '#4a4a4a',
-                padding: { x: 10, y: 5 }
-            })
-                .setOrigin(0.5)
-                .setInteractive();
+    //         // 이미지 저장 버튼
+    //         const saveButton = this.add.text(400, 450, 'Save Image', {
+    //             fontSize: '20px',
+    //             fill: '#fff',
+    //             backgroundColor: '#4a4a4a',
+    //             padding: { x: 10, y: 5 }
+    //         })
+    //             .setOrigin(0.5)
+    //             .setInteractive();
 
-            saveButton.on('pointerdown', () => {
-                const sizes = [16, 32, 64];
-                sizes.forEach(size => {
-                    const resizedCanvas = document.createElement('canvas');
-                    resizedCanvas.width = size;
-                    resizedCanvas.height = size;
-                    const ctx = resizedCanvas.getContext('2d');
-                    ctx.imageSmoothingEnabled = false;
-                    ctx.drawImage(canvas, 0, 0, size, size);
+    //         saveButton.on('pointerdown', () => {
+    //             const sizes = [16, 32, 64];
+    //             sizes.forEach(size => {
+    //                 const resizedCanvas = document.createElement('canvas');
+    //                 resizedCanvas.width = size;
+    //                 resizedCanvas.height = size;
+    //                 const ctx = resizedCanvas.getContext('2d');
+    //                 ctx.imageSmoothingEnabled = false;
+    //                 ctx.drawImage(canvas, 0, 0, size, size);
                     
-                    const link = document.createElement('a');
-                    link.download = `random_egg_${size}x${size}_${seed}.png`;
-                    link.href = resizedCanvas.toDataURL('image/png');
-                    link.click();
-                });
+    //                 const link = document.createElement('a');
+    //                 link.download = `random_egg_${size}x${size}_${seed}.png`;
+    //                 link.href = resizedCanvas.toDataURL('image/png');
+    //                 link.click();
+    //             });
+    //         });
+
+    //     } catch (error) {
+    //         console.error('Failed to generate egg:', error);
+    //     }
+    // }
+
+    // crateRandomGenButton() {
+    //     this.randomGenButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY/2, 'Generate Random Egg', {
+    //         fontSize: '20px',
+    //         fill: '#fff',
+    //         backgroundColor: '#4a4a4a',
+    //         padding: { x: 10, y: 5 }
+    //     }).setOrigin(0.5).setInteractive()
+    //     .on('pointerdown', () => {
+    //         this.scene.launch('RandomGenerator');
+    //     });
+        
+    // }
+
+    async checkWallet() {
+        const walletAddress = gameData.getWalletAddress();
+        if(walletAddress) {
+            // 반투명한 검은색 배경 추가
+            const darkOverlay = this.add.rectangle(0, 0, 
+                this.cameras.main.width,
+                this.cameras.main.height,
+                0x000000, 0.7
+            ).setOrigin(0);
+            darkOverlay.setDepth(100);
+
+            // 모든 게임 오브젝트의 상호작용 비활성화
+            this.input.enabled = false;
+
+            // 로딩 텍스트 생성
+            const loadingText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'check wallet...', {
+                fontFamily: 'Pixelify Sans',
+                fontSize: '24px',
+                color: '#ffffff'
+            }).setOrigin(0.5);
+            loadingText.setDepth(101);
+
+            // 로딩 텍스트 애니메이션
+            this.tweens.add({
+                targets: loadingText,
+                alpha: 0.3,
+                duration: 800,
+                ease: 'Power2',
+                yoyo: true,
+                repeat: -1
             });
 
-        } catch (error) {
-            console.error('Failed to generate egg:', error);
+            // 로딩 텍스트 점 애니메이션
+            let dots = 0;
+            const updateDots = () => {
+                dots = (dots + 1) % 4;
+                loadingText.setText('check wallet' + '.'.repeat(dots));
+            };
+            
+            const dotTimer = this.time.addEvent({
+                delay: 500,
+                callback: updateDots,
+                loop: true
+            });
+
+            try {
+                // const response = await axios.get('http://localhost:3000/isUser', {
+                //     params: {
+                //         walletAddress: walletAddress
+                //     }
+                // })
+
+                setTimeout(() => {
+                    // 타이머 정지
+                    dotTimer.destroy();
+                    // 로딩 텍스트와 오버레이 제거
+                    loadingText.destroy();
+                    darkOverlay.destroy();
+                    // 상호작용 다시 활성화
+                    this.input.enabled = true;
+                }, 2000);
+                
+                // 응답 처리
+                
+            } catch (error) {
+                // 타이머 정지
+                dotTimer.destroy();
+                // 로딩 텍스트와 오버레이 제거
+                loadingText.destroy();
+                darkOverlay.destroy();
+                // 상호작용 다시 활성화 
+                this.input.enabled = true;
+                console.error('Failed to check wallet:', error);
+            }
+        } else {
+            console.log('Please connect your wallet to continue.');
         }
     }
 
-    crateRandomGenButton() {
-        this.randomGenButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY/2, 'Generate Random Egg', {
-            fontSize: '20px',
-            fill: '#fff',
-            backgroundColor: '#4a4a4a',
-            padding: { x: 10, y: 5 }
-        }).setOrigin(0.5).setInteractive()
-        .on('pointerdown', () => {
-            this.scene.launch('RandomGenerator');
-        });
-        
-    }
     destroy() {
         this.cleanupAnimations();
         this.scale.off('resize', this.handleResize, this);

@@ -93,9 +93,7 @@ export default class PreLoad extends Scene
         this.load.spritesheet('nodePlanet', 'nodePlanet.png', { frameWidth: 128, frameHeight: 128 });
         this.load.spritesheet('blackHole', 'blackHole.png', { frameWidth: 256, frameHeight: 256 });
 
-
         
-        // this.load.atlas('ui', 'nine-slice.png', 'nine-slice.json');
         this.load.image('dialog_box', 'Card X5.png');   
         
 
@@ -164,6 +162,8 @@ export default class PreLoad extends Scene
             yoyo: false,
             duration: 5000
         })
+
+        
 
     }
 
