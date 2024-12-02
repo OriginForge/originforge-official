@@ -3,6 +3,7 @@ import { EventBus } from '../EventBus';
 import Dialog from '../components/Dialog/Dialog';
 import {gameData} from '../managers/GameDataManager';
 import axios from 'axios';
+import RegistrationModal from '../components/RegistrationModal/index'
 export default class MainMenu extends Scene {
     constructor() {
         super('MainMenu');
@@ -402,25 +403,20 @@ export default class MainMenu extends Scene {
 
             try {
                 const response = await axios.get('http://localhost:3000/isUser', {
-                    params: {
-                        walletAddress: walletAddress
-                    }
-                })
-
-                
+                    params: { walletAddress }
+                });
+    
                 if(response.data.isUser) {
                     alert('User is registered');
-                        
-                    this.input.enabled = true;
                 } else {
-                    alert('User is not registered');
+                    const registrationModal = new RegistrationModal(this);
+                    registrationModal.show();
                 }
-                    dotTimer.destroy();
-                    loadingText.destroy();
-                    darkOverlay.destroy();
                 
-                    this.input.enabled = true;
-                
+                dotTimer.destroy();
+                loadingText.destroy();
+                darkOverlay.destroy();
+                this.input.enabled = true;
                 
             } catch (error) {
                 // 타이머 정지

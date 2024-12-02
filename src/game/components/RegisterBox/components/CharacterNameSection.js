@@ -26,6 +26,24 @@ export function createCharacterNameSection(scene, characterContainer, characterI
         fontStyle: 'bold'
     }).setOrigin(0.5);
 
+    // 커서 깜빡임 효과를 위한 설정
+    const cursor = scene.add.text(0, 0, '|', {
+        fontSize: '26px',
+        color: '#000000',
+        fontStyle: 'bold'
+    }).setOrigin(0.5);
+    cursor.setVisible(false);
+
+    // 커서 깜빡임 애니메이션
+    const cursorBlink = scene.tweens.add({
+        targets: cursor,
+        alpha: 0,
+        duration: 500,
+        yoyo: true,
+        repeat: -1,
+        paused: true
+    });
+
     const showWarning = (message) => {
         warningText.setText(message);
         warningText.setVisible(true);
@@ -37,6 +55,8 @@ export function createCharacterNameSection(scene, characterContainer, characterI
             scene.input.keyboard.off('keydown', scene.keyboardListener);
             scene.keyboardListener = null;
         }
+        cursor.setVisible(false);
+        cursorBlink.pause();
     };
 
     const completeTextInput = () => {
@@ -67,6 +87,10 @@ export function createCharacterNameSection(scene, characterContainer, characterI
             displayedText.setVisible(false);
             scene.isEditing = true;
 
+            // 커서 활성화
+            cursor.setVisible(true);
+            cursorBlink.resume();
+
             removeKeyboardListener();
 
             scene.keyboardListener = (event) => {
@@ -95,12 +119,15 @@ export function createCharacterNameSection(scene, characterContainer, characterI
                     }
                 }
                 nameInput.setText(nameInput.text);
+                // 커서 위치 업데이트
+                cursor.x = nameInput.x + (nameInput.width / 2) + 5;
+                cursor.y = nameInput.y;
             };
 
             scene.input.keyboard.on('keydown', scene.keyboardListener);
         });
 
-    characterNameContainer.add([characterName, nameInput, displayedText, warningText]);
+    characterNameContainer.add([characterName, nameInput, displayedText, warningText, cursor]);
     nameInput.setVisible(false);
     warningText.setVisible(false);
 

@@ -357,4 +357,50 @@ export default class RandomGenerator extends Scene {
             `Match: ${isIdentical ? '✓ Identical' : '✗ Different'}`
         ).setLineSpacing(5);
     }
+
+    async generateNFT(scene) {
+        try {
+            const currentSeed = Date.now();
+            const imageProcessor = new ImageProcessor({
+                seed: currentSeed,
+                excludeColors: [
+                    {color: [255, 255, 255], tolerance: 3},
+                    {color: [57, 57, 70], tolerance: 2},
+                    {color: [0, 0, 0], tolerance: 3}
+                ]
+            });
+
+            const seededRandom = new SeededRandom(currentSeed);
+            const baseEggs = Array.from({length: 50}, (_, i) => `egg${i + 1}`);
+            const patternIndex = Math.floor(seededRandom.random() * baseEggs.length);
+            const baseImage = baseEggs[patternIndex];
+
+            const imageFile = scene.textures.get(baseImage)?.getSourceImage();
+            if (!imageFile) {
+                throw new Error(`Failed to get source image for ${baseImage}`);
+            }
+
+            const { canvas, seed, colorSet } = await imageProcessor.processImage(imageFile);
+
+            const textureKey = `generated_${seed}`;
+            const texture = scene.textures.createCanvas(textureKey, canvas.width, canvas.height);
+            texture.draw(0, 0, canvas);
+            texture.refresh();
+
+            const filteredColors = colorSet.filter(color => 
+                color.hex.toUpperCase() !== '#000000' && 
+                color.hex.toUpperCase() !== '#FFFFFF'
+            );
+
+            return {
+                seed,
+                baseImage,
+                textureKey,
+                colorSet: filteredColors
+            };
+        } catch (error) {
+            console.error('NFT Generation failed:', error);
+            throw error;
+        }
+    }
 }

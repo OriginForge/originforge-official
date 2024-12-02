@@ -3,7 +3,7 @@ import PreLoad from './scenes/PreLoad';
 import MainMenu from './scenes/MainScene';
 import RegisterBox from './components/RegisterBox/index';
 import RandomGenerator from './components/RandomGenerator/index';
-
+// import RegistrationModal from './components/RegistrationModal/index';
 //  Find out more information about the Game Config at:
 //  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 const config = {
@@ -22,6 +22,7 @@ const config = {
         MainMenu,
         RegisterBox,
         RandomGenerator,
+        // RegistrationModal,
     ],
 };
 
