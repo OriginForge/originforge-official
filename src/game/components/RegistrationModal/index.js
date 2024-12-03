@@ -1,3 +1,6 @@
+import axios from 'axios';
+import {gameData} from '../../managers/GameDataManager';
+
 export default class RegistrationModal {
     constructor(scene) {
         this.scene = scene;
@@ -13,6 +16,10 @@ export default class RegistrationModal {
         this.isAnimating = false;
         this.resultModal = null;
         this.nickname = '';
+        this.loadingText = null;
+        this.loadingDots = '';
+        this.loadingTimer = null;
+        this.mintButton = null;
         this.createParticleTexture();
     }
 
@@ -196,7 +203,7 @@ export default class RegistrationModal {
             fontFamily: 'Pixelify Sans'
         }).setOrigin(0.5).setVisible(false);
 
-        const mintButton = this.scene.add.rectangle(0, 150, 200, 50, 0x4a90e2)
+        this.mintButton = this.scene.add.rectangle(0, 150, 200, 50, 0x4a90e2)
             .setInteractive()
             .on('pointerdown', () => {
                 if (this.isEditing) {
@@ -204,14 +211,21 @@ export default class RegistrationModal {
                 }
                 this.handleMint();
             })
-            .on('pointerover', () => mintButton.setFillStyle(0x3a80d2))
-            .on('pointerout', () => mintButton.setFillStyle(0x4a90e2));
+            .on('pointerover', () => this.mintButton.setFillStyle(0x3a80d2))
+            .on('pointerout', () => this.mintButton.setFillStyle(0x4a90e2));
 
         const mintText = this.scene.add.text(0, 150, 'Mint NFT', {
             fontFamily: 'Pixelify Sans',
             fontSize: '18px',
             color: '#ffffff',
         }).setOrigin(0.5);
+
+        // 로딩 텍스트 추가
+        this.loadingText = this.scene.add.text(0, 200, '', {
+            fontFamily: 'Pixelify Sans',
+            fontSize: '18px',
+            color: '#4a90e2',
+        }).setOrigin(0.5).setVisible(false);
 
         this.container.add([
             panel,
@@ -227,9 +241,10 @@ export default class RegistrationModal {
             this.displayedText,
             this.cursor,
             this.warningText,
-            mintButton,
+            this.mintButton,
             mintText,
-            exitBtn
+            exitBtn,
+            this.loadingText
         ]);
 
         this.nameInput.setVisible(false);
@@ -323,6 +338,33 @@ export default class RegistrationModal {
         });
     }
 
+    startLoadingAnimation() {
+        this.loadingText.setVisible(true);
+        this.loadingDots = '';
+        if (this.loadingTimer) clearInterval(this.loadingTimer);
+        
+        // Mint 버튼 비활성화
+        this.mintButton.setFillStyle(0x666666);
+        this.mintButton.disableInteractive();
+        
+        this.loadingTimer = setInterval(() => {
+            this.loadingDots = this.loadingDots.length >= 3 ? '' : this.loadingDots + '.';
+            this.loadingText.setText('Minting in progress' + this.loadingDots);
+        }, 500);
+    }
+
+    stopLoadingAnimation() {
+        if (this.loadingTimer) {
+            clearInterval(this.loadingTimer);
+            this.loadingTimer = null;
+        }
+        this.loadingText.setVisible(false);
+        
+        // Mint 버튼 활성화
+        this.mintButton.setFillStyle(0x4a90e2);
+        this.mintButton.setInteractive();
+    }
+
     async handleMint() {
         const currentText = this.isEditing ? this.nameInput.text : this.displayedText.text;
         
@@ -339,29 +381,41 @@ export default class RegistrationModal {
         if (this.isAnimating) return;
         this.isAnimating = true;
 
-        try {
-            // RandomGenerator 씬 가져오기
-            let randomGenerator = this.scene.scene.get('RandomGenerator');
-            
-            // RandomGenerator 씬이 없으면 시작
-            if (!randomGenerator) {
-                this.scene.scene.launch('RandomGenerator');
-                randomGenerator = this.scene.scene.get('RandomGenerator');
-                // 씬이 완전히 로드될 때까지 대기
-                await new Promise(resolve => {
-                    randomGenerator.events.once('create', resolve);
-                });
-            }
+        this.startLoadingAnimation();
 
-            // NFT 생성
-            this.generatedNFT = await randomGenerator.generateNFT(this.scene);
-            
-            // 뽑기 애니메이션 시작
-            this.startGachaAnimation();
+        try {
+            const res = await axios.post('http://localhost:3000/register', {
+                userId: gameData.getWalletAddress(),
+                userAddress: gameData.getWalletAddress(),
+                userNickname: currentText,
+                type: "BrowserWallet"
+            });
+
+            this.stopLoadingAnimation();
+
+            this.generatedNFT = {
+                baseEggNumber: res.data.baseEggNumber,
+                colorSet: res.data.colorSet,
+                imageBase64: res.data.imageBase64,
+                seed: res.data.seed,
+                tokenId: res.data.tokenId,
+                txHash: res.data.txHash
+            };
+
+            // Base64 이미지를 텍스처로 로드하기 전에 이미지 객체로 변환
+            const image = new Image();
+            image.onload = () => {
+                const key = 'nft-' + this.generatedNFT.tokenId;
+                this.scene.textures.addImage(key, image);
+                this.startGachaAnimation();
+            };
+            image.src = this.generatedNFT.imageBase64;
+
         } catch (error) {
             console.error('Minting failed:', error);
             this.showWarning('NFT 생성에 실패했습니다');
             this.isAnimating = false;
+            this.stopLoadingAnimation();
         }
     }
 
@@ -437,7 +491,6 @@ export default class RegistrationModal {
             }
         });
     }
-
     showResultModal() {
         if (this.container) {
             this.container.destroy();
@@ -453,95 +506,201 @@ export default class RegistrationModal {
             return;
         }
 
-        this.container = this.scene.add.container(
-            this.scene.cameras.main.centerX,
-            -this.scene.cameras.main.height
-        ).setDepth(201);
+        // 화면 크기 및 모달 크기 설정
+        const { width: screenWidth, height: screenHeight } = this.scene.cameras.main;
+        const isMobile = screenWidth < 768;
+        const modalWidth = screenWidth * (isMobile ? 0.95 : 0.8);
+        const modalHeight = screenHeight * 0.75;
+        
+        // 여백 및 섹션 높이 계산 - 간격 최적화
+        const padding = modalHeight * 0.02; // 패딩 증가
+        const headerHeight = modalHeight * 0.12;
+        const nftSectionHeight = modalHeight * 0.4;
+        const infoSectionHeight = modalHeight * 0.28; // 정보 섹션 높이 증가
+        const buttonSectionHeight = modalHeight * 0.18;
 
-        const panel = this.scene.add.rectangle(0, 0, 600, 700, 0x1a1a1a)
-            .setStrokeStyle(4, 0x4a90e2);
+        this.container = this.scene.add.container(screenWidth / 2, -screenHeight).setDepth(201);
 
-        const congratsText = this.scene.add.text(0, -250, 'Congratulations!', {
+        const panel = this.scene.add.rectangle(0, 0, modalWidth, modalHeight, 0x1a1a1a)
+            .setStrokeStyle(3, 0x4a90e2);
+        const glowEffect = this.scene.add.rectangle(0, 0, modalWidth + 8, modalHeight + 8, 0x4a90e2, 0.2)
+            .setBlendMode(Phaser.BlendModes.ADD);
+
+        const congratsText = this.scene.add.text(0, -modalHeight/2 + headerHeight/2, '✨ Congratulations! ✨', {
             fontFamily: 'Pixelify Sans',
-            fontSize: '48px',
+            fontSize: isMobile ? '32px' : '48px',
             color: '#4a90e2',
         }).setOrigin(0.5);
 
-        const nftContainer = this.scene.add.container(0, 0);
-        const nftFrame = this.scene.add.rectangle(0, 0, 150, 150, 0x2a2a2a)
-            .setStrokeStyle(3, 0x4a90e2);
-        
-        // 생성된 NFT 이미지 표시
-        const nftImage = this.scene.add.sprite(0, 0, this.generatedNFT.textureKey)
+        // NFT 섹션
+        const nftContainer = this.scene.add.container(0, -modalHeight/2 + headerHeight + nftSectionHeight/2);
+        const nftSize = Math.min(modalWidth * 0.4, nftSectionHeight * 0.8);
+        const nftFrame = this.scene.add.rectangle(0, 0, nftSize, nftSize, 0x2a2a2a)
+            .setStrokeStyle(2, 0x4a90e2);
+        const nftImage = this.scene.add.image(0, 0, 'nft-' + this.generatedNFT.tokenId)
             .setScale(0)
-            .setAlpha(0);
+            .setAlpha(0)
+            .setOrigin(0.5);
 
-        const nicknameText = this.scene.add.text(0, 180, this.isEditing ? this.nameInput.text : this.displayedText.text, {
+        const textContainer = this.scene.add.container(0, nftSize/2 + padding * 1.5);
+        
+        const nicknameText = this.scene.add.text(0, 0, 
+            this.isEditing ? this.nameInput.text : this.displayedText.text, {
             fontFamily: 'Pixelify Sans',
-            fontSize: '32px',
+            fontSize: isMobile ? '28px' : '36px',
             color: '#ffffff',
         }).setOrigin(0.5);
 
-        const descText = this.scene.add.text(0, 250, 'Your unique Origin-Forge NFT\nhas been successfully minted!', {
+        const tokenIdText = this.scene.add.text(0, nicknameText.height + padding,
+            `🔷 Token ID: ${this.generatedNFT.tokenId}`, {
             fontFamily: 'Pixelify Sans',
-            fontSize: '24px',
+            fontSize: isMobile ? '16px' : '20px',
+            color: '#4a90e2',
+        }).setOrigin(0.5);
+
+        textContainer.add([nicknameText, tokenIdText]);
+
+        // 정보 섹션 - 간격 조정
+        const infoContainer = this.scene.add.container(0, -modalHeight/2 + headerHeight + nftSectionHeight + infoSectionHeight/2);
+        const nftInfoText = this.scene.add.text(0, -infoSectionHeight * 0.1,
+            `🥚 Base Egg: #${this.generatedNFT.baseEggNumber}`, {
+            fontFamily: 'Pixelify Sans',
+            fontSize: isMobile ? '18px' : '22px',
             color: '#cccccc',
             align: 'center'
         }).setOrigin(0.5);
 
-        const confirmButton = this.scene.add.rectangle(0, 300, 200, 50, 0x4a90e2)
-            .setInteractive()
-            .on('pointerdown', () => {
-                this.scene.scene.start('MainMenu');
-            })
-            .on('pointerover', () => confirmButton.setFillStyle(0x3a80d2))
-            .on('pointerout', () => confirmButton.setFillStyle(0x4a90e2));
+        // const colorSetText = this.scene.add.text(0, 0,
+        //     `🎨 Color Set: ${this.generatedNFT.colorSet}`, {
+        //     fontFamily: 'Pixelify Sans',
+        //     fontSize: isMobile ? '18px' : '22px',
+        //     color: '#cccccc',
+        //     align: 'center'
+        // }).setOrigin(0.5);
 
-        const confirmText = this.scene.add.text(0, 300, 'Awesome!', {
+        const seedText = this.scene.add.text(0, infoSectionHeight * 0.1,
+            `🌱 Seed: ${this.generatedNFT.seed.substring(0, 8)}...`, {
             fontFamily: 'Pixelify Sans',
-            fontSize: '24px',
+            fontSize: isMobile ? '18px' : '22px',
+            color: '#cccccc',
+            align: 'center'
+        }).setOrigin(0.5);
+
+        const descText = this.scene.add.text(0, infoSectionHeight * 0.4, 
+            '🎉 Your unique Origin-Forge NFT\nhas been successfully minted! 🎉', {
+            fontFamily: 'Pixelify Sans',
+            fontSize: isMobile ? '16px' : '20px',
+            color: '#4a90e2',
+            align: 'center',
+            lineSpacing: 10
+        }).setOrigin(0.5);
+
+        // 버튼 섹션 - 새로운 디자인
+        const buttonContainer = this.scene.add.container(0, modalHeight/2 - buttonSectionHeight/2);
+        const buttonWidth = modalWidth * 0.35; // 버튼 너비 증가
+        const buttonSpacing = modalWidth * 0.06;
+        const buttonHeight = buttonSectionHeight * 0.6;
+        const buttonRadius = 15; // 라운드 증가
+
+        // 메인 메뉴 버튼
+        const mainMenuButton = this.scene.add.graphics();
+        mainMenuButton.fillGradientStyle(0x6c5ce7, 0x5c4cd7, 0x4c3cc7, 0x4c3cc7, 1);
+        mainMenuButton.fillRoundedRect(-buttonWidth - buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
+        mainMenuButton.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth - buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains)
+            .on('pointerdown', () => this.scene.scene.start('MainMenu'))
+            .on('pointerover', () => {
+                mainMenuButton.clear();
+                mainMenuButton.fillGradientStyle(0x7c6cf7, 0x6c5ce7, 0x5c4cd7, 0x5c4cd7, 1);
+                mainMenuButton.fillRoundedRect(-buttonWidth - buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
+            })
+            .on('pointerout', () => {
+                mainMenuButton.clear();
+                mainMenuButton.fillGradientStyle(0x6c5ce7, 0x5c4cd7, 0x4c3cc7, 0x4c3cc7, 1);
+                mainMenuButton.fillRoundedRect(-buttonWidth - buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
+            });
+
+        // Close 버튼 텍스트를 버튼의 정중앙에 위치
+        const mainMenuText = this.scene.add.text(-buttonWidth - buttonSpacing/2 + buttonWidth/2, 0, 
+            'Close', {
+            fontFamily: 'Pixelify Sans',
+            fontSize: isMobile ? '18px' : '24px',
             color: '#ffffff',
         }).setOrigin(0.5);
 
-        nftContainer.add([nftFrame, nftImage]);
+        // OpenSea 버튼
+        const openSeaButton = this.scene.add.graphics();
+        openSeaButton.fillGradientStyle(0x2081E2, 0x1569AF, 0x1569AF, 0x1569AF, 1);
+        openSeaButton.fillRoundedRect(buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
+        openSeaButton.setInteractive(new Phaser.Geom.Rectangle(buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains)
+            .on('pointerdown', () => {
+                window.open(`https://opensea.io/assets/ethereum/CONTRACT_ADDRESS/${this.generatedNFT.tokenId}`, '_blank');
+            })
+            .on('pointerover', () => {
+                openSeaButton.clear();
+                openSeaButton.fillGradientStyle(0x3091F2, 0x2081E2, 0x2081E2, 0x2081E2, 1);
+                openSeaButton.fillRoundedRect(buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
+            })
+            .on('pointerout', () => {
+                openSeaButton.clear();
+                openSeaButton.fillGradientStyle(0x2081E2, 0x1569AF, 0x1569AF, 0x1569AF, 1);
+                openSeaButton.fillRoundedRect(buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
+            });
+
+        // OpenSea 텍스트를 버튼의 정중앙에 위치
+        const openSeaText = this.scene.add.text(buttonSpacing/2 + buttonWidth/2, 0, 
+            'OpenSea', {
+            fontFamily: 'Pixelify Sans',
+            fontSize: isMobile ? '18px' : '24px',
+            color: '#ffffff',
+        }).setOrigin(0.5);
+
+        buttonContainer.add([mainMenuButton, mainMenuText, openSeaButton, openSeaText]);
+        nftContainer.add([nftFrame, nftImage, textContainer]);
+        infoContainer.add([nftInfoText, seedText, descText]);
+        
         this.container.add([
+            glowEffect,
             panel,
             congratsText,
             nftContainer,
-            nicknameText,
-            descText,
-            confirmButton,
-            confirmText
+            infoContainer,
+            buttonContainer
         ]);
 
-        // 모달 애니메이션
+        // 등장 애니메이션
         this.scene.tweens.add({
             targets: this.container,
-            y: this.scene.cameras.main.centerY,
+            y: screenHeight / 2,
             duration: 1000,
-            ease: 'Bounce',
+            ease: 'Bounce.easeOut',
             onComplete: () => {
-                // NFT 이미지 페이드인 및 스케일 애니메이션
                 this.scene.tweens.add({
                     targets: nftImage,
-                    scaleX: 5,
-                    scaleY: 5,
+                    scaleX: isMobile ? 1.2 : 1.4,
+                    scaleY: isMobile ? 1.2 : 1.4,
                     alpha: 1,
                     duration: 1000,
                     ease: 'Back.easeOut',
                     onComplete: () => {
-                        // 숨쉬는 듯한 애니메이션
                         this.scene.tweens.add({
                             targets: nftImage,
-                            scaleX: { from: 5, to: 5.2 },
-                            scaleY: { from: 5, to: 5.2 },
+                            scaleX: { from: isMobile ? 1.2 : 1.4, to: isMobile ? 1.3 : 1.5 },
+                            scaleY: { from: isMobile ? 1.2 : 1.4, to: isMobile ? 1.3 : 1.5 },
+                            duration: 1500,
+                            yoyo: true,
+                            repeat: -1,
+                            ease: 'Sine.easeInOut'
+                        });
+
+                        this.scene.tweens.add({
+                            targets: glowEffect,
+                            alpha: { from: 0.2, to: 0.4 },
                             duration: 1000,
                             yoyo: true,
                             repeat: -1,
                             ease: 'Sine.easeInOut'
                         });
                         
-                        // 결과 화면에서 파티클 효과 생성
                         this.createResultParticles();
                     }
                 });
@@ -585,6 +744,12 @@ export default class RegistrationModal {
         if (this.keyboardListener) {
             this.scene.input.keyboard.off('keydown', this.keyboardListener);
             this.keyboardListener = null;
+        }
+
+        // 로딩 애니메이션 타이머 제거
+        if (this.loadingTimer) {
+            clearInterval(this.loadingTimer);
+            this.loadingTimer = null;
         }
 
         // 모든 트윈 애니메이션 정리

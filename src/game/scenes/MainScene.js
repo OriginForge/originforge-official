@@ -405,6 +405,7 @@ export default class MainMenu extends Scene {
                 const response = await axios.get('http://localhost:3000/isUser', {
                     params: { walletAddress }
                 });
+                
     
                 if(response.data.isUser) {
                     alert('User is registered');
