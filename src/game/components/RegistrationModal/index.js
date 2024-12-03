@@ -633,7 +633,7 @@ export default class RegistrationModal {
         openSeaButton.fillRoundedRect(buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
         openSeaButton.setInteractive(new Phaser.Geom.Rectangle(buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains)
             .on('pointerdown', () => {
-                window.open(`https://opensea.io/assets/ethereum/CONTRACT_ADDRESS/${this.generatedNFT.tokenId}`, '_blank');
+                window.open(`https://opensea.io/collection/testsbt2/${this.generatedNFT.tokenId}`, '_blank');
             })
             .on('pointerover', () => {
                 openSeaButton.clear();
