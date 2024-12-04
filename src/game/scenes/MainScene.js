@@ -402,7 +402,7 @@ export default class MainMenu extends Scene {
             });
 
             try {
-                const response = await axios.get('http://localhost:3000/isUser', {
+                const response = await axios.get('https://43.201.66.114:3000/isUser', {
                     params: { walletAddress }
                 });
                 
