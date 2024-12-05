@@ -48,7 +48,7 @@ export const customNetwork = defineChain({
   },
   rpcUrls: {
     default: {
-      https: ['https://public-en.node.kaia.io'],
+      http: ['http://15.165.41.156:8551'],
       webSocket: ['wss://public-en.node.kaia.io/ws'],
     },
   },
