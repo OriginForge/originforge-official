@@ -7,13 +7,27 @@ import NotFound from './components/NotFound';
 import { modal } from './main';
 import { useConnect } from 'wagmi'
 import { injected } from 'wagmi/connectors'
-
+import liff from "@line/liff"
 import '../public/style.css';
+
 function App ({isMobile}){
     const { connect } = useConnect()
 
     const phaserRef = useRef();
 
+    useEffect(() => {
+        liff.init({
+            liffId: "2006641289-koZEvRbX"
+        }).then(()=>{
+            console.log("liff init success");
+        }).catch((err)=>{
+            console.log("liff init error", err);
+        })
+
+        liff.getAppLanguage().then((lang)=>{
+            console.log("liff app language", lang);
+        })
+    }, [])
     // useEffect(() => {
     //     if(isMobile){
     //         connect({connector: injected()})
