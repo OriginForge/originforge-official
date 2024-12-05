@@ -24,16 +24,16 @@ function App ({isMobile}){
             console.log("liff init error", err);
         })
 
-
-        liff
-        .getProfile()
-        .then((profile) => {
-            console.log("liff profile", profile);
-        })
-        .catch((err) => {
-            console.log("error", err);
-        });
+        getProfile();
     }, [])
+
+
+    const getProfile = () => {
+        liff.getProfile().then((profile)=>{
+            console.log("liff profile", profile);
+            alert(JSON.stringify(profile));
+        })
+    }
     // useEffect(() => {
     //     if(isMobile){
     //         connect({connector: injected()})
