@@ -98,6 +98,13 @@ export default class RegistrationModal {
     }
 
     createModalContent() {
+        // 모달이 떴을 때 행성 오브젝트의 인터랙션을 비활성화
+        const planets = this.scene.children.list.filter(child => child.type === 'Sprite' && child.name.includes('planet'));
+        planets.forEach(planet => {
+            if (planet.input) {
+                planet.disableInteractive();
+            }
+        });
         this.container = this.scene.add.container(
             this.scene.cameras.main.centerX,
             this.scene.cameras.main.centerY
@@ -112,7 +119,13 @@ export default class RegistrationModal {
         const exitBtn = this.scene.add.image(230, -280, 'exitBtn')
             .setScale(1)
             .setInteractive()
-            .on('pointerdown', () => this.destroy())
+            .on('pointerdown', () => {
+                if (this.inputElement) {
+                    this.inputElement.remove();
+                    this.inputElement = null;
+                }
+                this.destroy();
+            })
             .on('pointerover', () => exitBtn.setTint(0xff0000))
             .on('pointerout', () => exitBtn.clearTint());
 
@@ -159,20 +172,20 @@ export default class RegistrationModal {
         }).setOrigin(0.5);
 
         // HTML input element 생성
-        const inputElement = document.createElement('input');
-        inputElement.type = 'text';
-        inputElement.style.position = 'absolute';
-        inputElement.style.width = '300px';
-        inputElement.style.height = '40px';
-        inputElement.style.fontSize = '16px';
-        inputElement.style.fontFamily = 'Pixelify Sans';
-        inputElement.style.color = '#ffffff';
-        inputElement.style.backgroundColor = '#2a2a2a';
-        inputElement.style.border = '1px solid #4a90e2';
-        inputElement.style.textAlign = 'center';
-        inputElement.style.display = 'none';
-        inputElement.maxLength = 12;
-        document.body.appendChild(inputElement);
+        this.inputElement = document.createElement('input');
+        this.inputElement.type = 'text';
+        this.inputElement.style.position = 'absolute';
+        this.inputElement.style.width = '300px';
+        this.inputElement.style.height = '40px';
+        this.inputElement.style.fontSize = '16px';
+        this.inputElement.style.fontFamily = 'Pixelify Sans';
+        this.inputElement.style.color = '#ffffff';
+        this.inputElement.style.backgroundColor = '#2a2a2a';
+        this.inputElement.style.border = '1px solid #4a90e2';
+        this.inputElement.style.textAlign = 'center';
+        this.inputElement.style.display = 'none';
+        this.inputElement.maxLength = 12;
+        document.body.appendChild(this.inputElement);
 
         const inputBg = this.scene.add.rectangle(0, 80, 300, 40, 0x2a2a2a)
             .setStrokeStyle(1, 0x4a90e2)
@@ -182,10 +195,10 @@ export default class RegistrationModal {
                 const rect = this.scene.game.canvas.getBoundingClientRect();
                 const x = rect.left + this.container.x;
                 const y = rect.top + this.container.y + 80;
-                inputElement.style.left = `${x - 150}px`;
-                inputElement.style.top = `${y - 20}px`;
-                inputElement.style.display = 'block';
-                inputElement.focus();
+                this.inputElement.style.left = `${x - 150}px`;
+                this.inputElement.style.top = `${y - 20}px`;
+                this.inputElement.style.display = 'block';
+                this.inputElement.focus();
             });
 
         this.nameInput = this.scene.add.text(0, 80, '', {
@@ -200,7 +213,7 @@ export default class RegistrationModal {
             fontFamily: 'Pixelify Sans'
         }).setOrigin(0.5);
 
-        inputElement.addEventListener('input', (e) => {
+        this.inputElement.addEventListener('input', (e) => {
             const value = e.target.value;
             if (/^[a-zA-Z0-9]*$/.test(value)) {
                 this.nameInput.setText(value);
@@ -211,8 +224,8 @@ export default class RegistrationModal {
             }
         });
 
-        inputElement.addEventListener('blur', () => {
-            inputElement.style.display = 'none';
+        this.inputElement.addEventListener('blur', () => {
+            this.inputElement.style.display = 'none';
             this.completeTextInput();
         });
 
@@ -263,11 +276,6 @@ export default class RegistrationModal {
             exitBtn,
             this.loadingText
         ]);
-
-        // Clean up on destroy
-        this.events.once('destroy', () => {
-            document.body.removeChild(inputElement);
-        });
 
         this.nameInput.setVisible(false);
     }
