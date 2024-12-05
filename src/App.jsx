@@ -28,7 +28,6 @@ function App ({isMobile}){
           setDisplayName(profile.displayName);
         })();
 
-        alert(displayName)
       }, [liff, isLoggedIn]);
     
       const showDisplayName = () => {

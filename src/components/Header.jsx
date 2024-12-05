@@ -6,6 +6,7 @@ import { gameData } from '../game/managers/GameDataManager';
 import { useMediaQuery } from 'react-responsive';
 import logo from '../../public/favicon.png';
 import { Menu, Home, Info, Gamepad2, Wallet } from 'lucide-react';
+import { LineLogin } from './LineLogin';
 
 export default function Header() {
     const { address, isConnected } = useAppKitAccount();
@@ -78,6 +79,7 @@ export default function Header() {
                 <div className="flex flex-1 items-center justify-end space-x-4">
                     {!isMobile && (
                         <nav className="flex items-center space-x-6">
+                            <LineLogin />
                             <TelegramLogin />
                             <Link to="/about" className="flex items-center gap-2 font-pixelify text-gray-300 hover:text-white">
                                 <Info size={16} />
@@ -118,6 +120,7 @@ export default function Header() {
                     <div className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur border-b border-gray-800">
                         <nav className="flex flex-col items-center py-6 space-y-4">
                         <div className="w-64 flex justify-center py-3">
+                                <LineLogin />
                                 <TelegramLogin />
                             </div>
                             <Link to="/" 
