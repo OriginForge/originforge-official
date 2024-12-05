@@ -27,6 +27,15 @@ function App ({isMobile}){
         liff.getAppLanguage().then((lang)=>{
             console.log("liff app language", lang);
         })
+
+        liff
+  .getProfile()
+  .then((profile) => {
+    console.log("liff profile", profile);
+  })
+  .catch((err) => {
+    console.log("error", err);
+  });
     }, [])
     // useEffect(() => {
     //     if(isMobile){
