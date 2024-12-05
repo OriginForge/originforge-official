@@ -27,6 +27,8 @@ function App ({isMobile}){
           const profile = await liff.getProfile();
           setDisplayName(profile.displayName);
         })();
+
+        alert(displayName)
       }, [liff, isLoggedIn]);
     
       const showDisplayName = () => {
@@ -60,7 +62,7 @@ function App ({isMobile}){
         <Router>
             <div id="app">
                 <Header />    
-                <h1>{showDisplayName()}</h1>       
+                
                 <Routes>
                     <Route path="/" element={<PhaserGame ref={phaserRef} />} />
                     <Route path="/game" element={<PhaserGame ref={phaserRef} />} />
