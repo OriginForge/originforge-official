@@ -512,14 +512,13 @@ export default class RegistrationModal {
         const modalHeight = screenHeight * 0.75;
         
         // 여백 및 섹션 높이 계산 - 간격 최적화
-        const padding = modalHeight * 0.02;
+        const padding = modalHeight * 0.02; // 패딩 증가
         const headerHeight = modalHeight * 0.12;
         const nftSectionHeight = modalHeight * 0.4;
-        const infoSectionHeight = modalHeight * 0.28;
+        const infoSectionHeight = modalHeight * 0.28; // 정보 섹션 높이 증가
         const buttonSectionHeight = modalHeight * 0.18;
 
-        // depth 값을 더 높게 설정
-        this.container = this.scene.add.container(screenWidth / 2, -screenHeight).setDepth(1001);
+        this.container = this.scene.add.container(screenWidth / 2, -screenHeight).setDepth(201);
 
         const panel = this.scene.add.rectangle(0, 0, modalWidth, modalHeight, 0x1a1a1a)
             .setStrokeStyle(3, 0x4a90e2);
@@ -537,17 +536,10 @@ export default class RegistrationModal {
         const nftSize = Math.min(modalWidth * 0.4, nftSectionHeight * 0.8);
         const nftFrame = this.scene.add.rectangle(0, 0, nftSize, nftSize, 0x2a2a2a)
             .setStrokeStyle(2, 0x4a90e2);
-            
-        // NFT 이미지에 depth 설정 추가
         const nftImage = this.scene.add.image(0, 0, 'nft-' + this.generatedNFT.tokenId)
             .setScale(0)
             .setAlpha(0)
-            .setOrigin(0.5)
-            .setDepth(1002); // 이미지의 depth를 컨테이너보다 높게 설정
-
-        // 모바일에서의 이미지 크기 조정
-        const mobileScale = isMobile ? 0.8 : 1.4;
-        const finalScale = isMobile ? 0.9 : 1.5;
+            .setOrigin(0.5);
 
         const textContainer = this.scene.add.container(0, nftSize/2 + padding * 1.5);
         
@@ -577,6 +569,14 @@ export default class RegistrationModal {
             align: 'center'
         }).setOrigin(0.5);
 
+        // const colorSetText = this.scene.add.text(0, 0,
+        //     `🎨 Color Set: ${this.generatedNFT.colorSet}`, {
+        //     fontFamily: 'Pixelify Sans',
+        //     fontSize: isMobile ? '18px' : '22px',
+        //     color: '#cccccc',
+        //     align: 'center'
+        // }).setOrigin(0.5);
+
         const seedText = this.scene.add.text(0, infoSectionHeight * 0.1,
             `🌱 Seed: ${this.generatedNFT.seed.substring(0, 8)}...`, {
             fontFamily: 'Pixelify Sans',
@@ -594,12 +594,12 @@ export default class RegistrationModal {
             lineSpacing: 10
         }).setOrigin(0.5);
 
-        // 버튼 섹션
+        // 버튼 섹션 - 새로운 디자인
         const buttonContainer = this.scene.add.container(0, modalHeight/2 - buttonSectionHeight/2);
-        const buttonWidth = modalWidth * 0.35;
+        const buttonWidth = modalWidth * 0.35; // 버튼 너비 증가
         const buttonSpacing = modalWidth * 0.06;
         const buttonHeight = buttonSectionHeight * 0.6;
-        const buttonRadius = 15;
+        const buttonRadius = 15; // 라운드 증가
 
         // 메인 메뉴 버튼
         const mainMenuButton = this.scene.add.graphics();
@@ -618,6 +618,7 @@ export default class RegistrationModal {
                 mainMenuButton.fillRoundedRect(-buttonWidth - buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
             });
 
+        // Close 버튼 텍스트를 버튼의 정중앙에 위치
         const mainMenuText = this.scene.add.text(-buttonWidth - buttonSpacing/2 + buttonWidth/2, 0, 
             'Close', {
             fontFamily: 'Pixelify Sans',
@@ -631,7 +632,7 @@ export default class RegistrationModal {
         openSeaButton.fillRoundedRect(buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
         openSeaButton.setInteractive(new Phaser.Geom.Rectangle(buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains)
             .on('pointerdown', () => {
-                window.open(`https://opensea.io/collection/testsbt2/${this.generatedNFT.tokenId}`, '_blank');
+                window.open(`https://opensea.io/assets/klaytn/0xf4bfff05f9444d394d084d9516a35c54a7b50222/${this.generatedNFT.tokenId}`, '_blank');
             })
             .on('pointerover', () => {
                 openSeaButton.clear();
@@ -644,6 +645,7 @@ export default class RegistrationModal {
                 openSeaButton.fillRoundedRect(buttonSpacing/2, -buttonHeight/2, buttonWidth, buttonHeight, buttonRadius);
             });
 
+        // OpenSea 텍스트를 버튼의 정중앙에 위치
         const openSeaText = this.scene.add.text(buttonSpacing/2 + buttonWidth/2, 0, 
             'OpenSea', {
             fontFamily: 'Pixelify Sans',
@@ -671,19 +673,18 @@ export default class RegistrationModal {
             duration: 1000,
             ease: 'Bounce.easeOut',
             onComplete: () => {
-                // 모바일에 맞춘 스케일 값 적용
                 this.scene.tweens.add({
                     targets: nftImage,
-                    scaleX: mobileScale,
-                    scaleY: mobileScale,
+                    scaleX: isMobile ? 1.2 : 1.4,
+                    scaleY: isMobile ? 1.2 : 1.4,
                     alpha: 1,
                     duration: 1000,
                     ease: 'Back.easeOut',
                     onComplete: () => {
                         this.scene.tweens.add({
                             targets: nftImage,
-                            scaleX: { from: mobileScale, to: finalScale },
-                            scaleY: { from: mobileScale, to: finalScale },
+                            scaleX: { from: isMobile ? 1.2 : 1.4, to: isMobile ? 1.3 : 1.5 },
+                            scaleY: { from: isMobile ? 1.2 : 1.4, to: isMobile ? 1.3 : 1.5 },
                             duration: 1500,
                             yoyo: true,
                             repeat: -1,
