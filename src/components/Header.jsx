@@ -1,5 +1,5 @@
 import { useAppKitAccount, useAppKit,useWalletInfo } from '@reown/appkit/react';
-
+import { TelegramLogin } from './TelegramLogin';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gameData } from '../game/managers/GameDataManager';
@@ -78,6 +78,7 @@ export default function Header() {
                 <div className="flex flex-1 items-center justify-end space-x-4">
                     {!isMobile && (
                         <nav className="flex items-center space-x-6">
+                            <TelegramLogin />
                             <Link to="/about" className="flex items-center gap-2 font-pixelify text-gray-300 hover:text-white">
                                 <Info size={16} />
                                 <span>About</span>
@@ -116,6 +117,9 @@ export default function Header() {
                 {isMobile && isMenuOpen && (
                     <div className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur border-b border-gray-800">
                         <nav className="flex flex-col items-center py-6 space-y-4">
+                        <div className="w-64 flex justify-center py-3">
+                                <TelegramLogin />
+                            </div>
                             <Link to="/" 
                                 className="flex items-center gap-3 px-6 py-3 font-pixelify text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 w-64"
                                 onClick={() => setIsMenuOpen(false)}

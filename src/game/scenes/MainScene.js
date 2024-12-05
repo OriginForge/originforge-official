@@ -434,6 +434,8 @@ export default class MainMenu extends Scene {
         }
     }
 
+    
+
     destroy() {
         this.cleanupAnimations();
         this.scale.off('resize', this.handleResize, this);
