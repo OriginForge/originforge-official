@@ -27,11 +27,38 @@ export default function Header() {
 
     const handleWalletClick = () => {
         if (isConnected) {
-            open({ view: 'Account' })
+            open({ view: 'Account' });
+            // 모달이 열릴 때 모든 상호작용 비활성화
+            const gameContainer = document.getElementById('game-container');
+            if (gameContainer) {
+                gameContainer.style.pointerEvents = 'none';
+            }
         } else {
-            open()
+            open();
+            // 모달이 열릴 때 모든 상호작용 비활성화
+            const gameContainer = document.getElementById('game-container');
+            if (gameContainer) {
+                gameContainer.style.pointerEvents = 'none';
+            }
         }
     };
+
+    // 모달이 닫힐 때 상호작용 다시 활성화
+    useEffect(() => {
+        const handleModalClose = () => {
+            const gameContainer = document.getElementById('game-container');
+            if (gameContainer) {
+                gameContainer.style.pointerEvents = 'auto';
+            }
+        };
+
+        // 모달이 닫힐 때 이벤트 리스너
+        window.addEventListener('modal-closed', handleModalClose);
+
+        return () => {
+            window.removeEventListener('modal-closed', handleModalClose);
+        };
+    }, []);
 
     return (    
         <header className="sticky top-0 z-50 w-full border-b bg-black/80 backdrop-blur">

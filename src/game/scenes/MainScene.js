@@ -407,12 +407,12 @@ export default class MainMenu extends Scene {
                 });
                 
     
-                if(response.data.isUser) {
-                    alert('User is registered');
-                } else {
+                // if(response.data.isUser) {
+                //     alert('User is registered');
+                // } else {
                     const registrationModal = new RegistrationModal(this);
                     registrationModal.show();
-                }
+                // }
                 
                 dotTimer.destroy();
                 loadingText.destroy();
