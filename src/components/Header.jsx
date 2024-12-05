@@ -27,9 +27,9 @@ export default function Header() {
 
     const handleWalletClick = () => {
         if (isConnected) {
-            open({ view: 'Account' })();
+            open({ view: 'Account' })
         } else {
-            open()();
+            open()
         }
     };
 

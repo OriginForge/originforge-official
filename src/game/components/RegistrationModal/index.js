@@ -158,16 +158,34 @@ export default class RegistrationModal {
             color: '#ffffff',
         }).setOrigin(0.5);
 
+        // HTML input element 생성
+        const inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.style.position = 'absolute';
+        inputElement.style.width = '300px';
+        inputElement.style.height = '40px';
+        inputElement.style.fontSize = '16px';
+        inputElement.style.fontFamily = 'Pixelify Sans';
+        inputElement.style.color = '#ffffff';
+        inputElement.style.backgroundColor = '#2a2a2a';
+        inputElement.style.border = '1px solid #4a90e2';
+        inputElement.style.textAlign = 'center';
+        inputElement.style.display = 'none';
+        inputElement.maxLength = 12;
+        document.body.appendChild(inputElement);
+
         const inputBg = this.scene.add.rectangle(0, 80, 300, 40, 0x2a2a2a)
             .setStrokeStyle(1, 0x4a90e2)
             .setInteractive()
             .on('pointerdown', () => {
                 this.isEditing = true;
-                this.nameInput.setVisible(true);
-                this.displayedText.setVisible(false);
-                this.cursor.setVisible(true);
-                this.cursorBlink.resume();
-                this.setupKeyboardListener();
+                const rect = this.scene.game.canvas.getBoundingClientRect();
+                const x = rect.left + this.container.x;
+                const y = rect.top + this.container.y + 80;
+                inputElement.style.left = `${x - 150}px`;
+                inputElement.style.top = `${y - 20}px`;
+                inputElement.style.display = 'block';
+                inputElement.focus();
             });
 
         this.nameInput = this.scene.add.text(0, 80, '', {
@@ -182,19 +200,20 @@ export default class RegistrationModal {
             fontFamily: 'Pixelify Sans'
         }).setOrigin(0.5);
 
-        this.cursor = this.scene.add.text(0, 80, '|', {
-            fontSize: '16px',
-            color: '#ffffff',
-            fontFamily: 'Pixelify Sans'
-        }).setOrigin(0.5).setVisible(false);
+        inputElement.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (/^[a-zA-Z0-9]*$/.test(value)) {
+                this.nameInput.setText(value);
+                this.displayedText.setText(value);
+            } else {
+                this.showWarning('영어와 숫자만 입력 가능합니다');
+                e.target.value = value.replace(/[^a-zA-Z0-9]/g, '');
+            }
+        });
 
-        this.cursorBlink = this.scene.tweens.add({
-            targets: this.cursor,
-            alpha: 0,
-            duration: 500,
-            yoyo: true,
-            repeat: -1,
-            paused: true
+        inputElement.addEventListener('blur', () => {
+            inputElement.style.display = 'none';
+            this.completeTextInput();
         });
 
         this.warningText = this.scene.add.text(0, 110, '', {
@@ -220,7 +239,6 @@ export default class RegistrationModal {
             color: '#ffffff',
         }).setOrigin(0.5);
 
-        // 로딩 텍스트 추가
         this.loadingText = this.scene.add.text(0, 200, '', {
             fontFamily: 'Pixelify Sans',
             fontSize: '18px',
@@ -239,7 +257,6 @@ export default class RegistrationModal {
             inputBg,
             this.nameInput,
             this.displayedText,
-            this.cursor,
             this.warningText,
             this.mintButton,
             mintText,
@@ -247,39 +264,21 @@ export default class RegistrationModal {
             this.loadingText
         ]);
 
+        // Clean up on destroy
+        this.events.once('destroy', () => {
+            document.body.removeChild(inputElement);
+        });
+
         this.nameInput.setVisible(false);
     }
 
     setupKeyboardListener() {
+        // 모바일 키보드를 위해 HTML input을 사용하므로 
+        // 기존 키보드 리스너는 제거
         if (this.keyboardListener) {
             this.scene.input.keyboard.off('keydown', this.keyboardListener);
+            this.keyboardListener = null;
         }
-
-        this.keyboardListener = (event) => {
-            if (!this.isEditing) return;
-
-            if (event.keyCode === 8) {
-                this.nameInput.text = this.nameInput.text.slice(0, -1);
-            } else if (event.keyCode === 27) {
-                this.cancelTextInput();
-            } else if (event.keyCode === 16) {
-                return;
-            } else {
-                const isValidInput = /^[a-zA-Z0-9]$/.test(event.key);
-                if (isValidInput && this.nameInput.text.length < 12) {
-                    this.nameInput.text += event.key;
-                } else if (!isValidInput && event.keyCode !== 16) {
-                    this.showWarning('영어와 숫자만 입력 가능합니다');
-                } else if (this.nameInput.text.length >= 12) {
-                    this.showWarning('최대 12자까지 입력 가능합니다');
-                }
-            }
-            this.nameInput.setText(this.nameInput.text);
-            this.displayedText.setText(this.nameInput.text);
-            this.cursor.x = this.nameInput.x + (this.nameInput.width / 2) + 5;
-        };
-
-        this.scene.input.keyboard.on('keydown', this.keyboardListener);
     }
 
     showWarning(message) {
