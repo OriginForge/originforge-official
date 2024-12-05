@@ -14,6 +14,8 @@ export const LineLogin = () => {
         })();
     }, [liff, isLoggedIn]);
 
+
+    
     if (error) return null;
     if (!isReady) return null;
 
