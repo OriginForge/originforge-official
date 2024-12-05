@@ -12,7 +12,7 @@ import '../public/style.css';
 
 function App ({isMobile}){
     const { connect } = useConnect()
-
+    const [profile, setProfile] = useState(null);
     const phaserRef = useRef();
 
     useEffect(() => {
@@ -31,7 +31,7 @@ function App ({isMobile}){
     const getProfile = () => {
         liff.getProfile().then((profile)=>{
             console.log("liff profile", profile);
-            alert(JSON.stringify(profile));
+            setProfile(profile);
         })
     }
     // useEffect(() => {
@@ -44,7 +44,8 @@ function App ({isMobile}){
     return (
         <Router>
             <div id="app">
-                <Header />               
+                <Header />    
+                <div>{profile?.displayName}</div>           
                 <Routes>
                     <Route path="/" element={<PhaserGame ref={phaserRef} />} />
                     <Route path="/game" element={<PhaserGame ref={phaserRef} />} />
