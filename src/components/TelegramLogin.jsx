@@ -3,7 +3,7 @@ import axios from 'axios';
 export const TelegramLogin = () => {
     return <LoginButton 
     // testbot
-        botUsername={"the_elementa_test_bot"}
+        botUsername={"elementa_test_bot"}
         buttonSize="large" // "large" | "medium" | "small"
         cornerRadius={5} // 0 - 20
         showAvatar={true} // true | false
