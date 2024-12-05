@@ -8,32 +8,47 @@ import { modal } from './main';
 import { useConnect } from 'wagmi'
 import { injected } from 'wagmi/connectors'
 import liff from "@line/liff"
+import {useLiff} from 'react-liff'
+
 import '../public/style.css';
 
 function App ({isMobile}){
     const { connect } = useConnect()
-    const [profile, setProfile] = useState(null);
+    const [displayName, setDisplayName] = useState(null);
+    const { error, isLoggedIn, isReady, liff } = useLiff();
+
+    
     const phaserRef = useRef();
 
     useEffect(() => {
-        liff.init({
-            liffId: "2006641289-koZEvRbX"
-        }).then(()=>{
-            console.log("liff init success");
-        }).catch((err)=>{
-            console.log("liff init error", err);
-        })
-
-        getProfile();
-    }, [])
-
-
-    const getProfile = () => {
-        liff.getProfile().then((profile)=>{
-            console.log("liff profile", profile);
-            setProfile(profile);
-        })
-    }
+        if (!isLoggedIn) return;
+    
+        (async () => {
+          const profile = await liff.getProfile();
+          setDisplayName(profile.displayName);
+        })();
+      }, [liff, isLoggedIn]);
+    
+      const showDisplayName = () => {
+        if (error) return <p>Something is wrong.</p>;
+        if (!isReady) return <p>Loading...</p>;
+    
+        if (!isLoggedIn) {
+          return (
+            <button className="App-button" onClick={liff.login}>
+              Login
+            </button>
+          );
+        }
+        return (
+          <>
+            <p>Welcome to the react-liff demo app, {displayName}!</p>
+            <button className="App-button" onClick={liff.logout}>
+              Logout
+            </button>
+          </>
+        );
+      };
     // useEffect(() => {
     //     if(isMobile){
     //         connect({connector: injected()})
@@ -45,7 +60,7 @@ function App ({isMobile}){
         <Router>
             <div id="app">
                 <Header />    
-                <div>{profile?.displayName}</div>           
+                <h1>{showDisplayName()}</h1>       
                 <Routes>
                     <Route path="/" element={<PhaserGame ref={phaserRef} />} />
                     <Route path="/game" element={<PhaserGame ref={phaserRef} />} />

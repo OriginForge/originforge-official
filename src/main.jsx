@@ -9,7 +9,7 @@ import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { injected } from 'wagmi/connectors';
 import {injectExampleEIP6963} from './utils/injectEIP6963';
 import * as dotenv from 'dotenv';
-
+import {LiffProvider} from 'react-liff';
 dotenv.config();
 
 injectExampleEIP6963();
@@ -118,9 +118,11 @@ export const modal = createAppKit({
   ReactDOM.createRoot(document.getElementById('root')).render(    
     <React.StrictMode>
       <WagmiProvider config={wagmiAdapter.wagmiConfig}>
+      <LiffProvider liffId="2006641289-koZEvRbX">
       <QueryClientProvider client={queryClient}>
          <App isMobile={isMobile}/>
         </QueryClientProvider>
+        </LiffProvider>
       </WagmiProvider>
     </React.StrictMode>
   )
