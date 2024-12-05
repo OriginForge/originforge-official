@@ -22,7 +22,8 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 
 const queryClient = new QueryClient();
 
-const projectId = import.meta.env.VITE_APPKIT_PROJECT_ID;
+const projectId = "5afb111b65801e2b7b4e5afbdc07fc2c";
+// const projectId = import.meta.env.VITE_APPKIT_PROJECT_ID;
 
 if (!projectId) {
   throw new Error('VITE_APPKIT_PROJECT_ID is not defined in environment variables');
