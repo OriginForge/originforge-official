@@ -384,7 +384,7 @@ export default class RegistrationModal {
         this.startLoadingAnimation();
 
         try {
-            const res = await axios.post('https://43.201.66.114:3000/register', {
+            const res = await axios.post('https://api.origin-forge.com/register', {
                 userId: gameData.getWalletAddress(),
                 userAddress: gameData.getWalletAddress(),
                 userNickname: currentText,
