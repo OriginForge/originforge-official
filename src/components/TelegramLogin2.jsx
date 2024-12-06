@@ -100,7 +100,7 @@ export const TelegramLogin = () => {
                     </div>
                 )}
             </button>
-            <div className="absolute opacity-0 pointer-events-auto">
+            {/* <div className="absolute opacity-0 pointer-events-auto">
                 <LoginButton 
                     botUsername={"elementa_test_bot"}
                     buttonSize="small"
@@ -109,7 +109,7 @@ export const TelegramLogin = () => {
                     lang={currentLang}
                     onAuthCallback={handleTelegramAuth}
                 />
-            </div>
+            </div> */}
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { LoginButton } from '@telegram-auth/react';
 import axios from 'axios';
 import { Lang } from '../game/managers/LanguageManager';
@@ -9,13 +9,6 @@ export const TelegramLogin = () => {
     const [isDisabled, setIsDisabled] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    useEffect(() => {
-        // Telegram 위젯 콜백 함수를 전역 객체에 등록
-        window.TelegramAuthLogin = {
-            onAuthCallback: handleTelegramAuth
-        };
-    }, []);
 
     const getButtonStyle = () => {
         if (isDisabled) {
@@ -43,16 +36,11 @@ export const TelegramLogin = () => {
         try {
             setIsLoading(true);
             const response = await axios.post(`https://api.origin-forge.com/auth/telegram`, {
-                ...data,
-                auth_date: Math.floor(Date.now() / 1000) // 현재 시간을 UNIX timestamp로 변환
+                ...data
             });
             
             if (response.data.success) {
                 setIsLoggedIn(true);
-                // 로그인 성공 시 추가 처리
-                if (window.TelegramAuthLogin?.onAuthCallback) {
-                    window.TelegramAuthLogin.onAuthCallback(data);
-                }
             } else {
                 alert(content.error);
             }
@@ -120,7 +108,6 @@ export const TelegramLogin = () => {
                     showAvatar={false}
                     lang={currentLang}
                     onAuthCallback={handleTelegramAuth}
-                    widgetVersion={21}
                 />
             </div>
         </div>
