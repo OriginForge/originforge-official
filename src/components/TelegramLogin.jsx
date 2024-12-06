@@ -11,8 +11,6 @@ export const TelegramLogin = () => {
 
     
     const getButtonIcon = () => {        
-        if (isPressed) return '/assets/connector/telegram/btn_press.png';
-        if (isHovered) return '/assets/connector/telegram/btn_hover.png';
         return '/assets/connector/telegram/btn_base.png';
     };
 
@@ -100,7 +98,19 @@ export const TelegramLogin = () => {
 };
 
 const languageTexts = {
-    en: { text: 'Continue with Telegram', short: 'Telegram' },
-    ja: { text: 'Telegramで続ける', short: 'Telegram' },
-    ko: { text: 'Telegram으로 계속하기', short: 'Telegram' }
+    en: { text: 'Telegram', short: 'Telegram' },
+    ja: { text: 'Telegram', short: 'Telegram' },
+    ko: { text: 'Telegram', short: 'Telegram' }
 };
+
+
+
+
+
+
+
+
+
+
+
+
