@@ -144,11 +144,18 @@ export default function Header() {
                             src={logo}
                             alt="Origin Forge Logo"
                             className={`rounded-lg ${logoSize} pixelated`}
-                            
                         />
-                        <h1 className={`font-pixelify font-bold text-white ${titleSize} `}>
-                            {isMobile ? 'Origin-Forge' : 'Origin-Forge'}
-                        </h1>
+                        {isMobile ? (
+                            <img 
+                                src="/assets/originText.svg" 
+                                alt="Origin Forge"
+                                className="h-13"
+                            />
+                        ) : (
+                            <h1 className={`font-pixelify font-bold text-white ${titleSize}`}>
+                                Origin-Forge
+                            </h1>
+                        )}
                     </Link>
 
                     <div className="flex flex-1 items-center justify-end space-x-4">
