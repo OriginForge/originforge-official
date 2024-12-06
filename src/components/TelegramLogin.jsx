@@ -42,8 +42,9 @@ export const TelegramLogin = () => {
             console.log(window.Telegram.WebApp.initData);
             console.log(window.Telegram.WebApp.initDataUnsafe);
             if (user) {
-                axios.post('/auth/telegram', {
-                    user
+                axios.post('https://api.origin-forge.com/auth/telegram', {
+                    unsafeUser: user,
+                    initData: window.Telegram.WebApp.initData
                 }).then(res => {
                     console.log(res);
                 });
