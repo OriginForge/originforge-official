@@ -40,9 +40,9 @@ export const KaiaLogin = () => {
     };
 
     const getButtonStyle = () => {
-        // if (isDisabled) {
-        //     return 'bg-white border border-[#E5E5E5] border-opacity-60 text-[#1E1E1E] text-opacity-20';
-        // }
+        if (isDisabled) {
+            return 'bg-white border border-[#E5E5E5] border-opacity-60 text-[#1E1E1E] text-opacity-20';
+        }
         
         // Safari에서 색상이 제대로 적용되도록 hex 코드 사용
         const baseStyle = 'bg-[#000000]'; // 명시적 hex 코드 사용

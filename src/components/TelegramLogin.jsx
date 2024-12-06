@@ -39,6 +39,7 @@ export const TelegramLogin = () => {
         if (window.Telegram && window.Telegram.WebApp) {
             // Telegram WebApp API 사용 가능
 
+            console.log(window.Telegram.WebApp.initData);
             console.log(window.Telegram.WebApp.initDataUnsafe);
             if (user) {
                 setDisplayName(`${user.first_name} ${user.last_name || ''} (${user.id})`);
