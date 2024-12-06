@@ -18,8 +18,7 @@ export const LineLogin = () => {
         })();
     }, [liff, isLoggedIn]);
 
-    const getButtonIcon = () => {
-        if (isDisabled) return '/assets/connector/line/btn_disabled.png';
+    const getButtonIcon = () => {        
         if (isPressed) return '/assets/connector/line/btn_press.png';
         if (isHovered) return '/assets/connector/line/btn_hover.png';
         return '/assets/connector/line/btn_base.png';
