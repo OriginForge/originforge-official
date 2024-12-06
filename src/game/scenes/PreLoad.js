@@ -97,7 +97,7 @@ export default class PreLoad extends Scene
         this.load.image('dialog_box', 'Card X5.png');   
         
 
-        Array.from({length: 50}, (_, i) => `egg${i + 1}`).forEach(eggKey => {
+        Array.from({length: 1}, (_, i) => `egg${i + 1}`).forEach(eggKey => {
             const number = eggKey.replace('egg', '');
             this.load.image(eggKey, `generate/${number}.png`);
         });

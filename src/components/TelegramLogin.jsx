@@ -1,77 +1,98 @@
-import { LoginButton } from '@telegram-auth/react'
-import axios from 'axios';
-import { useState, useEffect } from 'react';
-
+import React, { useState } from 'react';
+import { Lang } from '../game/managers/LanguageManager';
+// import { retrieveLaunchParams } from '@telegram-apps/sdk';
 export const TelegramLogin = () => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [displayName, setDisplayName] = useState('');
+    const [isHovered, setIsHovered] = useState(false);
+    const [isPressed, setIsPressed] = useState(false); 
+    const [isDisabled, setIsDisabled] = useState(false);
+    // const { initDataRaw, initData } = retrieveLaunchParams();
 
-    useEffect(() => {
-        if (isLoggedIn) {
-            alert('로그인 완료');
+    
+    const getButtonIcon = () => {        
+        if (isPressed) return '/assets/connector/telegram/btn_press.png';
+        if (isHovered) return '/assets/connector/telegram/btn_hover.png';
+        return '/assets/connector/telegram/btn_base.png';
+    };
+
+    const getButtonStyle = () => {
+        if (isDisabled) {
+            return 'bg-white border border-[#E5E5E5] border-opacity-60 text-[#1E1E1E] text-opacity-20';
         }
-    }, [isLoggedIn]);
+        
+        const baseStyle = 'bg-[#24A1DE]';
+        if (isPressed) {
+            return `${baseStyle} relative after:absolute after:inset-0 after:bg-black after:opacity-30`;
+        }
+        if (isHovered) {
+            return `${baseStyle} relative after:absolute after:inset-0 after:bg-black after:opacity-10`;
+        }
+        return baseStyle;
+    };
 
-    useEffect(() => {
-        // 텔레그램 버튼 스타일 강제 적용
-        const style = document.createElement('style');
-        style.textContent = `
-            .telegram-login-button {
-                position: relative !important;
-                display: flex !important;
-                align-items: center !important;
-                width: 100% !important;
-                height: 48px !important;
-                border-radius: 6px !important;
-                font-family: sans-serif !important;
-                font-weight: 500 !important;
-                font-size: 16px !important;
-                transition: all 0.2s !important;
-                overflow: hidden !important;
-                background-color: #0088cc !important;
-                color: white !important;
-                border: none !important;
-                cursor: pointer !important;
+    const currentLang = Lang.getCurrentLanguage();
+    const content = languageTexts[currentLang] || languageTexts.en;
+
+    const handleTelegramLogin = () => {
+        // 텔레그램 로그인 로직 구현
+        const user = window.Telegram.WebApp.initDataUnsafe?.user;
+        if (window.Telegram && window.Telegram.WebApp) {
+            // Telegram WebApp API 사용 가능
+
+            console.log(window.Telegram.WebApp.initDataUnsafe);
+            if (user) {
+                setDisplayName(`${user.first_name} ${user.last_name || ''} (${user.id})`);
             }
-            .telegram-login-button:hover {
-                background-color: #0077b3 !important;
-            }
-        `;
-        document.head.appendChild(style);
-        return () => document.head.removeChild(style);
-    }, []);
+        } else {
+            console.log('Telegram WebApp API not available');
+        }
+    };
 
     return (
-        <div className="relative flex items-center w-full h-12">
-            <LoginButton 
-                botUsername={"elementa_test_bot"}
-                buttonSize="large" 
-                cornerRadius={5}
-                showAvatar={false}
-                authCallbackUrl={`${window.location.origin}/auth/telegram`}
-                lang="en"
-                className="telegram-login-button"
-                onAuthCallback={async (data) => {
-                    try {
-                        setIsLoading(true);
-                        const response = await axios.post(`https://api.origin-forge.com/auth/telegram`, {
-                            ...data
-                        });
-                        
-                        if (response.data.success) {
-                            setIsLoggedIn(true);
-                            // 로그인 완료 처리 추가
-                        } else {
-                            alert('로그인에 실패했습니다.');
-                        }
-                    } catch (error) {
-                        alert('로그인 처리 중 오류가 발생했습니다.');
-                        console.error(error);
-                    } finally {
-                        setIsLoading(false);
-                    }
-                }}
-            />
-        </div>
-    )
-}
+        <button
+            onClick={!isDisabled ? handleTelegramLogin : undefined}
+            onMouseEnter={() => !isDisabled && setIsHovered(true)}
+            onMouseLeave={() => {
+                if (!isDisabled) {
+                    setIsHovered(false);
+                    setIsPressed(false);
+                }
+            }}
+            onMouseDown={() => !isDisabled && setIsPressed(true)}
+            onMouseUp={() => !isDisabled && setIsPressed(false)}
+            disabled={isDisabled}
+            className={`
+                relative
+                flex items-center
+                w-full h-12
+                rounded-md
+                font-sans font-medium text-base
+                transition-all duration-200
+                overflow-hidden
+                ${getButtonStyle()}
+                ${!isDisabled && 'text-white'}
+            `}
+            style={{
+                direction: currentLang === 'ar' ? 'rtl' : 'ltr'
+            }}
+        >
+            <div className="flex items-center justify-center w-[52px] h-full relative">
+                <img 
+                    src={getButtonIcon()}
+                    alt="Telegram Logo"
+                    className="w-6 h-6 z-20"
+                />
+                <div className="absolute right-0 top-2 bottom-2 w-px bg-black bg-opacity-[0.08] z-10" />
+            </div>
+            <div className="flex-1 text-center pr-[52px] z-20">
+                {displayName || content.text}
+            </div>
+        </button>
+    );
+};
+
+const languageTexts = {
+    en: { text: 'Continue with Telegram', short: 'Telegram' },
+    ja: { text: 'Telegramで続ける', short: 'Telegram' },
+    ko: { text: 'Telegram으로 계속하기', short: 'Telegram' }
+};
