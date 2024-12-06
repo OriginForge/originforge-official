@@ -9,7 +9,13 @@ export const TelegramLogin = () => {
     const [isDisabled, setIsDisabled] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [telegramLoginButton, setTelegramLoginButton] = useState(null);
+
+    useEffect(() => {
+        // Telegram 위젯 콜백 함수를 전역 객체에 등록
+        window.TelegramAuthLogin = {
+            onAuthCallback: handleTelegramAuth
+        };
+    }, []);
 
     const getButtonStyle = () => {
         if (isDisabled) {
@@ -26,18 +32,6 @@ export const TelegramLogin = () => {
         return baseStyle;
     };
 
-    useEffect(() => {
-        // Telegram 스크립트 로드
-        const script = document.createElement('script');
-        script.src = 'https://telegram.org/js/telegram-widget.js?22';
-        script.async = true;
-        document.body.appendChild(script);
-
-        return () => {
-            document.body.removeChild(script);
-        };
-    }, []);
-
     if (isLoggedIn) {
         return null;
     }
@@ -49,40 +43,30 @@ export const TelegramLogin = () => {
         try {
             setIsLoading(true);
             const response = await axios.post(`https://api.origin-forge.com/auth/telegram`, {
-                ...data
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                ...data,
+                auth_date: Math.floor(Date.now() / 1000) // 현재 시간을 UNIX timestamp로 변환
             });
             
             if (response.data.success) {
                 setIsLoggedIn(true);
                 // 로그인 성공 시 추가 처리
-                localStorage.setItem('telegram_auth', JSON.stringify(response.data));
+                if (window.TelegramAuthLogin?.onAuthCallback) {
+                    window.TelegramAuthLogin.onAuthCallback(data);
+                }
             } else {
                 alert(content.error);
             }
         } catch (error) {
             alert(content.errorProcess);
-            console.error('Telegram auth error:', error);
+            console.error(error);
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const handleCustomButtonClick = () => {
-        // 숨겨진 텔레그램 로그인 버튼 클릭
-        const telegramLoginBtn = document.querySelector('.telegram-login-button');
-        if (telegramLoginBtn) {
-            telegramLoginBtn.click();
         }
     };
 
     return (
         <div className="relative">
             <button
-                onClick={handleCustomButtonClick}
                 onMouseEnter={() => !isDisabled && setIsHovered(true)}
                 onMouseLeave={() => {
                     if (!isDisabled) {
@@ -128,15 +112,15 @@ export const TelegramLogin = () => {
                     </div>
                 )}
             </button>
-            <div className="absolute opacity-0 pointer-events-none telegram-login-button">
+            <div className="absolute opacity-0 pointer-events-auto">
                 <LoginButton 
-                    botUsername="elementa_test_bot"
-                    buttonSize="large"
+                    botUsername={"elementa_test_bot"}
+                    buttonSize="small"
                     cornerRadius={5}
                     showAvatar={false}
                     lang={currentLang}
                     onAuthCallback={handleTelegramAuth}
-                    requestAccess="write"
+                    widgetVersion={21}
                 />
             </div>
         </div>
