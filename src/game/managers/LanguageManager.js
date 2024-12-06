@@ -1,24 +1,18 @@
-import ko from '../config/languages/ko';
-import en from '../config/languages/en';
+import languages from '../config/languages';
 
 class LanguageManager {
     constructor() {
-        this.languages = {
-            ko,
-            en
-        };
-        this.currentLanguage = 'en';  // 기본 언어
-        
-        // 브라우저 언어 감지
-        // this.detectLanguage();
+        this.languages = languages;
+        this.currentLanguage = this.detectBrowserLanguage();
     }
 
-    // detectLanguage() {
-    //     const browserLang = navigator.language.split('-')[0];
-    //     if (this.languages[browserLang]) {
-    //         this.currentLanguage = browserLang;
-    //     }
-    // }
+    detectBrowserLanguage() {
+        const browserLang = navigator.language.split('-')[0];
+        if (this.languages[browserLang]) {
+            return browserLang;
+        }
+        return 'en';  // 기본 언어
+    }
 
     setLanguage(lang) {
         if (this.languages[lang]) {

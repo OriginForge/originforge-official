@@ -7,17 +7,50 @@ import NotFound from './components/NotFound';
 import { modal } from './main';
 import { useConnect } from 'wagmi'
 import { injected } from 'wagmi/connectors'
-
+import liff from "@line/liff"
+import {useLiff} from 'react-liff'
 
 import '../public/style.css';
 
 function App ({isMobile}){
     const { connect } = useConnect()
+    const [displayName, setDisplayName] = useState(null);
+    const { error, isLoggedIn, isReady, liff } = useLiff();
 
     
     const phaserRef = useRef();
 
+    useEffect(() => {
+        if (!isLoggedIn) return;
+    
+        (async () => {
+          const profile = await liff.getProfile();
+          setDisplayName(profile.displayName);
+        })();
 
+        alert(displayName)
+      }, [liff, isLoggedIn]);
+    
+      const showDisplayName = () => {
+        if (error) return <p>Something is wrong.</p>;
+        if (!isReady) return <p>Loading...</p>;
+    
+        if (!isLoggedIn) {
+          return (
+            <button className="App-button" onClick={liff.login}>
+              Login
+            </button>
+          );
+        }
+        return (
+          <>
+            <p>Welcome to the react-liff demo app, {displayName}!</p>
+            <button className="App-button" onClick={liff.logout}>
+              Logout
+            </button>
+          </>
+        );
+      };
     // useEffect(() => {
     //     if(isMobile){
     //         connect({connector: injected()})
