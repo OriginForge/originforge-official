@@ -37,7 +37,6 @@ export const TelegramLogin = () => {
         const user = window.Telegram.WebApp.initDataUnsafe?.user;
         if (window.Telegram && window.Telegram.WebApp) {
             // Telegram WebApp API 사용 가능
-
             console.log(window.Telegram.WebApp.initData);
             console.log(window.Telegram.WebApp.initDataUnsafe);
             if (user) {
@@ -48,9 +47,14 @@ export const TelegramLogin = () => {
                     console.log(res);
                 });
                 // setDisplayName(`${user.first_name} ${user.last_name || ''} (${user.id})`);
+            } else {
+                // 유저가 없는 경우 텔레그램 봇으로 이동
+                window.location.href = 'https://t.me/elementa_test_bot?start=webapp';
             }
         } else {
             console.log('Telegram WebApp API not available');
+            // Telegram WebApp API를 사용할 수 없는 경우에도 봇으로 이동
+            window.location.href = 'https://t.me/elementa_test_bot?start=webapp';
         }
     };
 

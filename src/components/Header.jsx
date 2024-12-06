@@ -4,39 +4,11 @@ import { Link } from 'react-router-dom';
 import { gameData } from '../game/managers/GameDataManager';
 import { useMediaQuery } from 'react-responsive';
 import logo from '../../public/favicon.png';
-import { Menu, Home, Info, Gamepad2, Wallet, Languages, ChevronDown } from 'lucide-react';
+import { Menu, Home, Info, Gamepad2, Wallet } from 'lucide-react';
 import { LineLogin } from './LineLogin';
 import ConnectModal from './ConnectModal';
 import { Lang } from '../game/managers/LanguageManager';
 import languages from '../game/config/languages';
-
-// 지원하는 언어 목록을 languages 객체에서 생성
-const SUPPORTED_LANGUAGES = Object.entries(languages).map(([code, data]) => {
-    const labels = {
-        en: 'English',
-        ko: '한국어',
-        ja: '日本語',
-        de: 'Deutsch',
-        es: 'Español',
-        fr: 'Français',
-        id: 'Bahasa Indonesia',
-        it: 'Italiano',
-        ms: 'Bahasa Melayu',
-        'pt-BR': 'Português (Brasil)',
-        'pt-PT': 'Português (Portugal)',
-        ru: 'Русский',
-        th: 'ไทย',
-        tr: 'Türkçe',
-        ar: 'العربية',
-        vi: 'Tiếng Việt',
-        'zh-CN': '简体中文',
-        'zh-TW': '繁體中文'
-    };
-    return {
-        code,
-        label: labels[code] || code
-    };
-});
 
 export default function Header() {
     const isMobile = useMediaQuery({ maxWidth: 768 });
@@ -44,8 +16,6 @@ export default function Header() {
     const [showConnectModal, setShowConnectModal] = useState(false);
     const logoSize = isMobile ? 'h-5 w-5' : 'h-7 w-7';
     const titleSize = isMobile ? 'text-2xl' : 'text-3xl';
-    const [currentLang, setCurrentLang] = useState(Lang.getCurrentLanguage());
-    const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
     const handleWalletClick = () => {
         const gameContainer = document.getElementById('game-container');
@@ -62,61 +32,6 @@ export default function Header() {
             gameContainer.style.pointerEvents = 'auto';
         }
     };
-
-    const handleLanguageChange = (lang) => {
-        Lang.setLanguage(lang);
-        setCurrentLang(lang);
-        setIsLangMenuOpen(false);
-    };
-
-    // 데스크톱 버전의 언어 선택 드롭다운
-    const LanguageDropdown = () => (
-        <div className="relative">
-            <button 
-                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="flex items-center gap-2 font-pixelify text-gray-300 hover:text-white"
-            >
-                <Languages size={16} />
-                <span>{currentLang.toUpperCase()}</span>
-                <ChevronDown size={14} />
-            </button>
-
-            {isLangMenuOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-black/90 border border-gray-800 rounded-lg shadow-lg max-h-96 overflow-y-auto">
-                    <div className="py-1">
-                        {SUPPORTED_LANGUAGES.map((lang) => (
-                            <button
-                                key={lang.code}
-                                onClick={() => handleLanguageChange(lang.code)}
-                                className="block w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 text-left"
-                            >
-                                {lang.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-
-    // 모바일 버전의 언어 선택 버튼들
-    const MobileLanguageButtons = () => (
-        <>
-            {SUPPORTED_LANGUAGES.map((lang) => (
-                <button 
-                    key={lang.code}
-                    onClick={() => {
-                        handleLanguageChange(lang.code);
-                        setIsMenuOpen(false);
-                    }}
-                    className="flex items-center gap-3 px-6 py-3 font-pixelify text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 w-64"
-                >
-                    <Languages size={20} />
-                    <span className="font-medium">{lang.label}</span>
-                </button>
-            ))}
-        </>
-    );
 
     // 모달이 닫힐 때 상호작용 다시 활성화
     useEffect(() => {
@@ -171,7 +86,6 @@ export default function Header() {
                                     <Gamepad2 size={16} />
                                     <span>Game</span>
                                 </Link>
-                                <LanguageDropdown />
                             </nav>
                         )}
                         
@@ -220,7 +134,6 @@ export default function Header() {
                                     <Gamepad2 size={20} />
                                     <span className="font-medium">Game</span>
                                 </Link>
-                                <MobileLanguageButtons />
                             </nav>
                         </div>
                     )}
