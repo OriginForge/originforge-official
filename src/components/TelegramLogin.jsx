@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Lang } from '../game/managers/LanguageManager';
+import axios from 'axios';
 // import { retrieveLaunchParams } from '@telegram-apps/sdk';
 export const TelegramLogin = () => {
     const [displayName, setDisplayName] = useState('');
