@@ -175,7 +175,7 @@ export default class MainMenu extends Scene {
 
         this.planetContainer.add([nodePlanet, tooltipBg, tooltipText]);
         
-        nodePlanet.play('nodePlanet_anim').setScale(3).setInteractive()
+        nodePlanet.play('nodePlanet_anim').setScale(3).setInteractive('false')
             .on('pointerdown', () => {
                 this.tweens.add({
                     targets: nodePlanet,

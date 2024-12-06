@@ -4,16 +4,16 @@ import { PhaserGame } from './game/PhaserGame';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import NotFound from './components/NotFound';
-import { modal } from './main';
-import { useConnect } from 'wagmi'
-import { injected } from 'wagmi/connectors'
+// import { modal } from './main';
+// import { useConnect } from 'wagmi'
+// import { injected } from 'wagmi/connectors'
 import liff from "@line/liff"
 import {useLiff} from 'react-liff'
 
 import '../public/style.css';
 
 function App ({isMobile}){
-    const { connect } = useConnect()
+    // const { connect } = useConnect()
     const [displayName, setDisplayName] = useState(null);
     const { error, isLoggedIn, isReady, liff } = useLiff();
 
