@@ -87,10 +87,9 @@ export const LineLogin = () => {
 
 // 언어별 텍스트 매핑
 const languageTexts = {
-    en: { text: 'Log in with LINE', short: 'Log in' },
-    ja: { text: 'LINEでログイン', short: 'ログイン' },
-    ko: { text: 'LINE으로 로그인', short: '로그인' },
-    // ... 다른 언어 설정
+    en: { text: 'LINE', short: 'LINE' },
+    ja: { text: 'LINE', short: 'LINE' },
+    ko: { text: 'LINE', short: 'LINE' },
 };
 
 export default LineLogin;

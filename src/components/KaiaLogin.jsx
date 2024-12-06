@@ -3,22 +3,22 @@
 import React, { useEffect, useState } from 'react';
 import { Lang } from '../game/managers/LanguageManager';
 
-export const KaikasLogin = () => {
+export const KaiaLogin = () => {
     const [isHovered, setIsHovered] = useState(false);
     const [isPressed, setIsPressed] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
 
-    // Kaikas 지갑 연결 가능 여부 확인
+    // Kaia 지갑 연결 가능 여부 확인
     useEffect(() => {
-        const checkKaikasAvailable = () => {
+        const checkKaiaAvailable = () => {
             if (typeof window.klaytn === 'undefined') {
                 setIsDisabled(true);
             }
         };
-        checkKaikasAvailable();
+        checkKaiaAvailable();
     }, []);
 
-    // Kaikas 지갑 연결 핸들러
+    // Kaia 지갑 연결 핸들러
     const handleConnect = async () => {
         if (isDisabled) return;
         
@@ -31,12 +31,12 @@ export const KaikasLogin = () => {
                 console.log('Account changed:', accounts[0]);
             });
         } catch (error) {
-            console.error('Failed to connect to Kaikas:', error);
+            console.error('Failed to connect to Kaia:', error);
         }
     };
 
     const getButtonIcon = () => {
-        return '/assets/connector/kaikas/btn_base.png';
+        return '/assets/connector/Kaia/btn_base.png';
     };
 
     const getButtonStyle = () => {
@@ -44,7 +44,7 @@ export const KaikasLogin = () => {
             return 'bg-white border border-[#E5E5E5] border-opacity-60 text-[#1E1E1E] text-opacity-20';
         }
         
-        const baseStyle = 'bg-black'; // Kaikas 기본 배경색: #000000
+        const baseStyle = 'bg-black'; // Kaia 기본 배경색: #000000
         if (isPressed) {
             return `${baseStyle} relative after:absolute after:inset-0 after:bg-black after:opacity-30`;
         }
@@ -56,11 +56,11 @@ export const KaikasLogin = () => {
 
     // 언어별 텍스트
     const languageTexts = {
-        en: 'Connect with Kaikas Wallet',
-        ko: 'Kaikas 지갑으로 연결',
-        ja: 'Kaikasウォレットで接続',
-        'zh-CN': '使用Kaikas钱包连接',
-        'zh-TW': '使用Kaikas錢包連接'
+        en: 'Kaia Wallet',
+        ko: 'Kaia Wallet',
+        ja: 'Kaia Wallet',
+        'zh-CN': 'Kaia Wallet',
+        'zh-TW': 'Kaia Wallet'
     };
 
     const currentLang = Lang.getCurrentLanguage();
@@ -94,8 +94,8 @@ export const KaikasLogin = () => {
             {/* 왼쪽 아이콘 영역 */}
             <div className="flex items-center justify-center w-[52px] h-full relative">
                 <img 
-                    src={'public/assets/connector/kaikas/btn_base.png'}
-                    alt="Kaikas Logo"
+                    src={'/assets/connector/Kaia/btn_base.png'}
+                    alt="Kaia Logo"
                     className="w-6 h-6 z-20"
                     style={{ filter: isDisabled ? 'grayscale(100%)' : 'none' }}
                 />
@@ -114,4 +114,4 @@ export const KaikasLogin = () => {
     );
 };
 
-export default KaikasLogin;
+export default KaiaLogin;

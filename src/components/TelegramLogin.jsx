@@ -116,17 +116,17 @@ export const TelegramLogin = () => {
 
 const languageTexts = {
     en: { 
-        text: 'Log in with Telegram',
+        text: 'Telegram',
         error: 'Login failed',
         errorProcess: 'An error occurred during login'
     },
     ja: { 
-        text: 'Telegramでログイン',
+        text: 'Telegram',
         error: 'ログインに失敗しました',
         errorProcess: 'ログイン処理中にエラーが発生しました'
     },
     ko: { 
-        text: 'Telegram으로 로그인',
+        text: 'Telegram',
         error: '로그인에 실패했습니다',
         errorProcess: '로그인 처리 중 오류가 발생했습니다'
     }
