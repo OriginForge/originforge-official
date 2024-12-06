@@ -12,6 +12,35 @@ export const TelegramLogin = () => {
         }
     }, [isLoggedIn]);
 
+    useEffect(() => {
+        // 텔레그램 버튼 스타일 강제 적용
+        const style = document.createElement('style');
+        style.textContent = `
+            .telegram-login-button {
+                position: relative !important;
+                display: flex !important;
+                align-items: center !important;
+                width: 100% !important;
+                height: 48px !important;
+                border-radius: 6px !important;
+                font-family: sans-serif !important;
+                font-weight: 500 !important;
+                font-size: 16px !important;
+                transition: all 0.2s !important;
+                overflow: hidden !important;
+                background-color: #0088cc !important;
+                color: white !important;
+                border: none !important;
+                cursor: pointer !important;
+            }
+            .telegram-login-button:hover {
+                background-color: #0077b3 !important;
+            }
+        `;
+        document.head.appendChild(style);
+        return () => document.head.removeChild(style);
+    }, []);
+
     return (
         <div className="relative flex items-center w-full h-12">
             <LoginButton 
@@ -19,18 +48,9 @@ export const TelegramLogin = () => {
                 buttonSize="large" 
                 cornerRadius={5}
                 showAvatar={false}
+                authCallbackUrl={`${window.location.origin}/auth/telegram`}
                 lang="en"
-                className={`
-                    relative
-                    flex items-center
-                    w-full h-12
-                    rounded-md
-                    font-sans font-medium text-base
-                    transition-all duration-200
-                    overflow-hidden
-                    bg-[#0088cc]
-                    text-white
-                `}
+                className="telegram-login-button"
                 onAuthCallback={async (data) => {
                     try {
                         setIsLoading(true);

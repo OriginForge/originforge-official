@@ -44,12 +44,13 @@ export const KaiaLogin = () => {
             return 'bg-white border border-[#E5E5E5] border-opacity-60 text-[#1E1E1E] text-opacity-20';
         }
         
-        const baseStyle = 'bg-black'; // Kaia 기본 배경색: #000000
+        // Safari에서 색상이 제대로 적용되도록 hex 코드 사용
+        const baseStyle = 'bg-[#000000]'; // 명시적 hex 코드 사용
         if (isPressed) {
-            return `${baseStyle} relative after:absolute after:inset-0 after:bg-black after:opacity-30`;
+            return `${baseStyle} relative after:absolute after:inset-0 after:bg-[#000000] after:opacity-30`; 
         }
         if (isHovered) {
-            return `${baseStyle} relative after:absolute after:inset-0 after:bg-black after:opacity-10`;
+            return `${baseStyle} relative after:absolute after:inset-0 after:bg-[#000000] after:opacity-10`;
         }
         return baseStyle;
     };
@@ -90,6 +91,10 @@ export const KaiaLogin = () => {
                 min-w-[280px]
                 ${getButtonStyle()}
             `}
+            style={{
+                // Safari를 위한 fallback 스타일
+                backgroundColor: isDisabled ? '#FFFFFF' : '#000000'
+            }}
         >
             {/* 왼쪽 아이콘 영역 */}
             <div className="flex items-center justify-center w-[52px] h-full relative">
@@ -97,17 +102,32 @@ export const KaiaLogin = () => {
                     src={'/assets/connector/Kaia/btn_base.png'}
                     alt="Kaia Logo"
                     className="w-6 h-6 z-20"
-                    style={{ filter: isDisabled ? 'grayscale(100%)' : 'none' }}
+                    style={{ 
+                        filter: isDisabled ? 'grayscale(100%)' : 'none',
+                        // Safari에서 이미지가 잘 보이도록 보정
+                        WebkitFilter: isDisabled ? 'grayscale(100%)' : 'none'
+                    }}
                 />
                 {/* 수직 구분선 */}
-                <div className="absolute right-0 top-2 bottom-2 w-px bg-[#BFF009] bg-opacity-[0.08] z-10" />
+                <div 
+                    className="absolute right-0 top-2 bottom-2 w-px z-10" 
+                    style={{
+                        // Safari를 위한 명시적 배경색 지정
+                        backgroundColor: 'rgba(191, 240, 9, 0.08)'
+                    }}
+                />
             </div>
 
             {/* 텍스트 영역 */}
-            <div className={`
-                flex-1 text-center pr-[52px] z-20
-                ${isDisabled ? 'text-[#1E1E1E] text-opacity-20' : 'text-white'}
-            `}>
+            <div 
+                className={`
+                    flex-1 text-center pr-[52px] z-20
+                `}
+                style={{
+                    // Safari를 위한 텍스트 색상 명시적 지정
+                    color: isDisabled ? 'rgba(30, 30, 30, 0.2)' : '#FFFFFF'
+                }}
+            >
                 {buttonText}
             </div>
         </button>
