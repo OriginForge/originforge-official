@@ -140,11 +140,13 @@ export default function Header() {
             <header className="sticky top-0 z-50 w-full border-b bg-black/80 backdrop-blur">
                 <div className="mx-auto flex h-16 max-w-screen-2xl items-center px-4">
                     <Link to="/" className="flex items-center gap-2 hover:opacity-80">
-                        <img 
-                            src={logo}
-                            alt="Origin Forge Logo"
-                            className={`rounded-lg ${logoSize} pixelated`}
-                        />
+                        {!isMobile && (
+                            <img 
+                                src={logo}
+                                alt="Origin Forge Logo"
+                                className={`rounded-lg ${logoSize} pixelated`}
+                            />
+                        )}
                         {isMobile ? (
                             <img 
                                 src="/assets/originText.svg" 
