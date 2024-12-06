@@ -42,7 +42,12 @@ export const TelegramLogin = () => {
             console.log(window.Telegram.WebApp.initData);
             console.log(window.Telegram.WebApp.initDataUnsafe);
             if (user) {
-                setDisplayName(`${user.first_name} ${user.last_name || ''} (${user.id})`);
+                axios.post('/auth/telegram', {
+                    user
+                }).then(res => {
+                    console.log(res);
+                });
+                // setDisplayName(`${user.first_name} ${user.last_name || ''} (${user.id})`);
             }
         } else {
             console.log('Telegram WebApp API not available');
