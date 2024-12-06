@@ -46,7 +46,7 @@ export const TelegramLogin = () => {
                 }).then(res => {
                     console.log(res);
                 });
-                // setDisplayName(`${user.first_name} ${user.last_name || ''} (${user.id})`);
+                setDisplayName(`${user.first_name} ${user.last_name || ''} (${user.id})`);
             } else {
                 // 유저가 없는 경우 텔레그램 봇으로 이동
                 window.location.href = 'https://t.me/elementa_test_bot?start=webapp';
