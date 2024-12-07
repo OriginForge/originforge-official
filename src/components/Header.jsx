@@ -10,6 +10,7 @@ import ConnectModal from './ConnectModal';
 import { Lang } from '../game/managers/LanguageManager';
 import languages from '../game/config/languages';
 import { EventBus } from '../game/EventBus';
+import { useLiff } from '../hooks/useLiff';
 
 export default function Header() {
     const isMobile = useMediaQuery({ maxWidth: 768 });
@@ -17,7 +18,8 @@ export default function Header() {
     const [showConnectModal, setShowConnectModal] = useState(false);
     const logoSize = isMobile ? 'h-5 w-5' : 'h-7 w-7';
     const titleSize = isMobile ? 'text-2xl' : 'text-3xl';
-    const [lineProfile, setLineProfile] = useState(gameData.getLineProfile());
+    const [lineProfile, setLineProfile] = useState(null);
+    const { isLoggedIn, liff } = useLiff();
 
     const handleWalletClick = () => {
         const gameContainer = document.getElementById('game-container');
@@ -52,6 +54,24 @@ export default function Header() {
         };
     }, []);
 
+    // 초기 로딩 시와 로그인 상태 변경 시 프로필 체크
+    useEffect(() => {
+        const checkLineProfile = async () => {
+            if (isLoggedIn && liff) {
+                try {
+                    const profile = await liff.getProfile();
+                    gameData.setLineProfile(profile);
+                    setLineProfile(profile);
+                } catch (error) {
+                    console.error('Failed to fetch LINE profile:', error);
+                }
+            }
+        };
+
+        checkLineProfile();
+    }, [isLoggedIn, liff]);
+
+    // Line 프로필 업데이트 이벤트 리스너
     useEffect(() => {
         const handleLineProfileUpdate = (profile) => {
             setLineProfile(profile);
@@ -59,6 +79,7 @@ export default function Header() {
 
         EventBus.on('line-profile-updated', handleLineProfileUpdate);
         
+        // 컴포넌트 언마운트 시 이벤트 리스너 제거
         return () => {
             EventBus.off('line-profile-updated', handleLineProfileUpdate);
         };
