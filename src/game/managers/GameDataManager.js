@@ -1,10 +1,24 @@
 import { EventBus } from '../EventBus';
 
-class GameDataManager {
+export class GameDataManager {
+    static instance = null;
+
+    static getInstance() {
+        if (!GameDataManager.instance) {
+            GameDataManager.instance = new GameDataManager();
+        }
+        return GameDataManager.instance;
+    }
+
     constructor() {
+        if (GameDataManager.instance) {
+            return GameDataManager.instance;
+        }
         this.playerData = null;
         this.walletAddress = null;
         this.isInitialized = false;
+        this.lineProfile = null;
+        GameDataManager.instance = this;
     }
 
     setWalletAddress(address) {
@@ -40,6 +54,20 @@ class GameDataManager {
     getWalletAddress() {
         return this.walletAddress;
     }
+
+    setLineProfile(profile) {
+        this.lineProfile = profile;
+        EventBus.emit('line-profile-updated', profile);
+    }
+
+    getLineProfile() {
+        return this.lineProfile;
+    }
+
+    isLineLoggedIn() {
+        return !!this.lineProfile;
+    }
 }
 
-export const gameData = new GameDataManager(); 
+// 싱글톤 �스턴스 export
+export const gameData = GameDataManager.getInstance(); 

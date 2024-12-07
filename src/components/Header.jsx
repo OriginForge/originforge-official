@@ -9,6 +9,7 @@ import { LineLogin } from './LineLogin';
 import ConnectModal from './ConnectModal';
 import { Lang } from '../game/managers/LanguageManager';
 import languages from '../game/config/languages';
+import { EventBus } from '../game/EventBus';
 
 export default function Header() {
     const isMobile = useMediaQuery({ maxWidth: 768 });
@@ -16,6 +17,7 @@ export default function Header() {
     const [showConnectModal, setShowConnectModal] = useState(false);
     const logoSize = isMobile ? 'h-5 w-5' : 'h-7 w-7';
     const titleSize = isMobile ? 'text-2xl' : 'text-3xl';
+    const [lineProfile, setLineProfile] = useState(gameData.getLineProfile());
 
     const handleWalletClick = () => {
         const gameContainer = document.getElementById('game-container');
@@ -49,6 +51,45 @@ export default function Header() {
             window.removeEventListener('modal-closed', handleModalClose);
         };
     }, []);
+
+    useEffect(() => {
+        const handleLineProfileUpdate = (profile) => {
+            setLineProfile(profile);
+        };
+
+        EventBus.on('line-profile-updated', handleLineProfileUpdate);
+        
+        return () => {
+            EventBus.off('line-profile-updated', handleLineProfileUpdate);
+        };
+    }, []);
+
+    const renderConnectButton = () => {
+        if (lineProfile) {
+            return (
+                <div className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
+                             border border-gray-700 text-gray-300">
+                    <img 
+                        src="/assets/connector/line/btn_base.png"
+                        alt="LINE Logo"
+                        className="w-4 h-4"
+                    />
+                    <span>{lineProfile.displayName}</span>
+                </div>
+            );
+        }
+
+        return (
+            <button 
+                onClick={handleWalletClick}
+                className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
+                         border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white"
+            >
+                <Wallet size={16} color="#9CA3AF" />
+                Connect
+            </button>
+        );
+    };
 
     return (    
         <>
@@ -90,14 +131,7 @@ export default function Header() {
                         )}
                         
                         <div className="flex items-center space-x-4">
-                            <button 
-                                onClick={handleWalletClick}
-                                className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 transition-colors duration-200 
-                                         border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white"
-                            >
-                                <Wallet size={16} color="#9CA3AF" />
-                                Connect
-                            </button>
+                            {renderConnectButton()}
                             
                             {isMobile && (
                                 <button 

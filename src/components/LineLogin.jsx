@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLiff } from 'react-liff';
 import { Lang } from '../game/managers/LanguageManager';
+import { gameData } from '../game/managers/GameDataManager';
 
 export const LineLogin = () => {
     const [displayName, setDisplayName] = useState('');
@@ -15,6 +16,7 @@ export const LineLogin = () => {
         (async () => {
             const profile = await liff.getProfile();
             setDisplayName(profile.displayName);
+            gameData.setLineProfile(profile);
             console.log(profile);
         })();
     }, [liff, isLoggedIn]);
