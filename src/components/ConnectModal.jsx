@@ -45,7 +45,7 @@ export default function ConnectModal({ isOpen, onClose }) {
         {/* 상단 장식 테두리 */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-[#01C9A2]/50 to-transparent animate-glow" />
         
-        <div className="relative text-center mb-8">
+        <div className="relative text-center mb-16">
           <h2 className="font-pixelify text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#01C9A2] to-teal-300 
                          tracking-wider absolute w-full left-0 right-0 animate-pulse">
             CONNECT WALLET

@@ -15,6 +15,7 @@ export const LineLogin = () => {
         (async () => {
             const profile = await liff.getProfile();
             setDisplayName(profile.displayName);
+            console.log(profile);
         })();
     }, [liff, isLoggedIn]);
 
