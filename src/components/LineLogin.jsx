@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLiff } from 'react-liff';
 import { Lang } from '../game/managers/LanguageManager';
-import { gameData } from '../game/managers/GameDataManager';
+import { GameDataManager } from '../game/managers/GameDataManager';
 
 export const LineLogin = () => {
     const [displayName, setDisplayName] = useState('');
@@ -9,6 +9,7 @@ export const LineLogin = () => {
     const [isPressed, setIsPressed] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
     const { error, isLoggedIn, isReady, liff } = useLiff();
+    const gameData = GameDataManager.getInstance();
 
     useEffect(() => {
         if (!isLoggedIn) return;
