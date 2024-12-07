@@ -14,7 +14,7 @@ export const LineLogin = () => {
 
         (async () => {
             const profile = await liff.getProfile();
-            setDisplayName(`${profile.displayName} (${profile.userId})`);
+            setDisplayName(profile.displayName);
         })();
     }, [liff, isLoggedIn]);
 
@@ -79,7 +79,7 @@ export const LineLogin = () => {
                 <div className="absolute right-0 top-2 bottom-2 w-px bg-black bg-opacity-[0.08] z-10" />
             </div>
             <div className="flex-1 text-center pr-[52px] z-20">
-                {content.text}
+                {isLoggedIn ? displayName : content.text}
             </div>
         </button>
     );

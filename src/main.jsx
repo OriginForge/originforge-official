@@ -7,12 +7,12 @@ import App from './App.jsx';
 // import { defineChain } from '@reown/appkit/networks'
 // import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 // import { injected } from 'wagmi/connectors';
-import {injectExampleEIP6963} from './utils/injectEIP6963';
+// import {injectExampleEIP6963} from './utils/injectEIP6963';
 import * as dotenv from 'dotenv';
 import {LiffProvider} from 'react-liff';
 dotenv.config();
 
-injectExampleEIP6963();
+// injectExampleEIP6963();
 
 const userAgent = typeof window.navigator === 'undefined' ? '' : navigator.userAgent;
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
