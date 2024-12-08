@@ -7,6 +7,8 @@ import { Gift, Navigation, ExternalLink, Share2, QrCode } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Helmet } from 'react-helmet-async';
 
+
+
 export default function UserRoutePage() {
     const { nickname } = useParams();
     const [isLoading, setIsLoading] = useState(true);
