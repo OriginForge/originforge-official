@@ -27,6 +27,7 @@
         "@walletconnect/modal-core": "^2.7.0",
         "@walletconnect/modal-ui": "^2.7.0",
         "axios": "^1.7.7",
+        "caver-js": "^1.12.2",
         "dotenv": "^16.4.5",
         "lucide-react": "^0.460.0",
         "phaser": "^3.87.0",

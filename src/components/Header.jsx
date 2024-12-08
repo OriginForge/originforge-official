@@ -1,6 +1,6 @@
 import { TelegramLogin } from './TelegramLogin';
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { gameData } from '../game/managers/GameDataManager';
 import { useMediaQuery } from 'react-responsive';
 import logo from '../../public/favicon.png';
@@ -10,7 +10,7 @@ import ConnectModal from './ConnectModal';
 import { Lang } from '../game/managers/LanguageManager';
 import languages from '../game/config/languages';
 import { EventBus } from '../game/EventBus';
-
+import { ConnectBtn } from './ConnectBtn';
 export default function Header() {
     const isMobile = useMediaQuery({ maxWidth: 768 });
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -64,32 +64,32 @@ export default function Header() {
         };
     }, []);
 
-    const renderConnectButton = () => {
-        if (lineProfile) {
-            return (
-                <div className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
-                             border border-gray-700 text-gray-300">
-                    <img 
-                        src="/assets/connector/line/btn_base.png"
-                        alt="LINE Logo"
-                        className="w-4 h-4"
-                    />
-                    <span>{lineProfile.displayName}</span>
-                </div>
-            );
-        }
+    // const renderConnectButton = () => {
+    //     if (lineProfile) {
+    //         return (
+    //             <div className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
+    //                          border border-gray-700 text-gray-300">
+    //                 <img 
+    //                     src="/assets/connector/line/btn_base.png"
+    //                     alt="LINE Logo"
+    //                     className="w-4 h-4"
+    //                 />
+    //                 <span>{lineProfile.displayName}</span>
+    //             </div>
+    //         );
+    //     }
 
-        return (
-            <button 
-                onClick={handleWalletClick}
-                className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
-                         border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white"
-            >
-                <Wallet size={16} color="#9CA3AF" />
-                Connect
-            </button>
-        );
-    };
+    //     return (
+    //         <button 
+    //             onClick={handleWalletClick}
+    //             className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
+    //                      border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white"
+    //         >
+    //             <Wallet size={16} color="#9CA3AF" />
+    //             Connect
+    //         </button>
+    //     );
+    // };
 
     return (    
         <>
@@ -131,7 +131,7 @@ export default function Header() {
                         )}
                         
                         <div className="flex items-center space-x-4">
-                            {renderConnectButton()}
+                            <ConnectBtn />
                             
                             {/* {isMobile && (
                                 <button 
