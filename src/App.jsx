@@ -47,10 +47,15 @@ function App ({isMobile}){
 
     return (
         <HelmetProvider>
-            <Router>
+            <Router basename="/">
                 <div id="app">
                     <Header />    
-                    
+                    <Helmet>
+                        <base href="/" />
+                        <link rel="icon" type="image/png" href="/favicon.png" />
+                        <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+                        <link rel="apple-touch-icon" href="/favicon.png" />
+                    </Helmet>
                     <Routes>
                         <Route path="/" element={<PhaserGame ref={phaserRef} />} />
                         <Route path="/game" element={<PhaserGame ref={phaserRef} />} />
