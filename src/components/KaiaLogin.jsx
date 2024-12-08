@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Lang } from '../game/managers/LanguageManager';
+import { gameData } from '../game/managers/GameDataManager';
+import { EventBus } from '../game/EventBus';
 
 export const KaiaLogin = () => {
     const [isHovered, setIsHovered] = useState(false);
@@ -24,12 +26,28 @@ export const KaiaLogin = () => {
         
         try {
             const accounts = await window.klaytn.enable();
-            console.log('Connected account:', accounts[0]);
+
             
-            // 계정 변경 이벤트 리스너
-            window.klaytn.on('accountsChanged', function(accounts) {
-                console.log('Account changed:', accounts[0]);
-            });
+            const isUser = await gameData._checkIsUser(accounts[0]);
+            
+            if(!isUser){
+                gameData.setPlayerInfo(accounts[0], 'kaia');
+                gameData.getWalletAddress()
+                // ConnectModal 닫기
+                EventBus.emit('connect-modal-closed');
+                // MainScene의 checkWallet 실행
+                EventBus.emit('check-wallet');
+            } else {
+               await  gameData.getPlayerInfo(accounts[0], 'kaia');
+                EventBus.emit('connect-modal-closed');
+            }
+
+            // console.log('Connected account:', accounts[0]);
+            
+            // // 계정 변경 이벤트 리스너
+            // window.klaytn.on('accountsChanged', function(accounts) {
+            //     console.log('Account changed:', accounts[0]);
+            // });
         } catch (error) {
             console.error('Failed to connect to Kaia:', error);
         }

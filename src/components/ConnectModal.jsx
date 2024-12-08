@@ -3,6 +3,7 @@ import { LineLogin } from './LineLogin'
 import { TelegramLogin } from './TelegramLogin'
 import { KaiaLogin } from './KaiaLogin'
 import { X } from 'lucide-react'
+import { EventBus } from '../game/EventBus'
 
 export default function ConnectModal({ isOpen, onClose }) {
   const handleKaikasConnect = () => {
@@ -19,6 +20,18 @@ export default function ConnectModal({ isOpen, onClose }) {
       document.removeEventListener('click', preventBackgroundClick, true)
     }
   }, [isOpen])
+
+  useEffect(() => {
+    const handleModalClose = () => {
+      onClose()
+    }
+
+    EventBus.on('connect-modal-closed', handleModalClose)
+
+    return () => {
+      EventBus.off('connect-modal-closed', handleModalClose)
+    }
+  }, [onClose])
 
   const preventBackgroundClick = (e) => {
     if (!e.target.closest('.modal-content')) {

@@ -16,9 +16,22 @@ export default class MainMenu extends Scene {
         this.lastGameSize = null; // 마지막 게임 사이즈 저장
         this.planetContainer = null; // 행성 컨테이너 추가
         this.imageGenerator = null;
+        // 카메라 초기화
+        this.cameraConfig = {
+            width: 0,
+            height: 0,
+            centerX: 0,
+            centerY: 0
+        };
     }
 
     init() {
+        // 카메라 설정 업데이트
+        this.cameraConfig.width = this.scale.width;
+        this.cameraConfig.height = this.scale.height;
+        this.cameraConfig.centerX = this.scale.width / 2;
+        this.cameraConfig.centerY = this.scale.height / 2;
+
         this.cameras.main.fadeIn(100);
         const fxCamera = this.cameras.main.postFX.addPixelate(40);
         this.add.tween({
@@ -41,7 +54,13 @@ export default class MainMenu extends Scene {
     preload() {
     }
     create() {
-        this.background = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
+        // 카메라 설정 업데이트
+        this.cameraConfig.width = this.scale.width;
+        this.cameraConfig.height = this.scale.height;
+        this.cameraConfig.centerX = this.scale.width / 2;
+        this.cameraConfig.centerY = this.scale.height / 2;
+
+        this.background = this.add.image(this.cameraConfig.centerX, this.cameraConfig.centerY, 'background');
         this.updateBackgroundScale();
         // 잠시 주석
         // this.crateRandomGenButton()        
@@ -74,16 +93,19 @@ export default class MainMenu extends Scene {
         
         this.scale.on('resize', this.handleResize, this);
 
-        
+        // check-wallet 이벤트 리스너 추가
+        EventBus.on('check-wallet', () => {
+            this.checkWallet();
+        });
     }
     
 
     calculateSpawnArea() {
         return {
-            x: -this.cameras.main.width * 2,
-            y: -this.cameras.main.height * 2,
-            width: this.cameras.main.width * 5,
-            height: this.cameras.main.height * 5
+            x: -this.cameraConfig.width * 2,
+            y: -this.cameraConfig.height * 2,
+            width: this.cameraConfig.width * 5,
+            height: this.cameraConfig.height * 5
         };
     }
 
@@ -104,6 +126,12 @@ export default class MainMenu extends Scene {
                 height: gameSize.height
             };
             
+            // 카메라 설정 업데이트
+            this.cameraConfig.width = gameSize.width;
+            this.cameraConfig.height = gameSize.height;
+            this.cameraConfig.centerX = gameSize.width / 2;
+            this.cameraConfig.centerY = gameSize.height / 2;
+            
             this.updateBackgroundScale();
             
             if (this.isAnimating) {
@@ -112,7 +140,7 @@ export default class MainMenu extends Scene {
 
             // 행성 위치 업데이트
             if (this.planetContainer) {
-                this.planetContainer.setPosition(this.cameras.main.centerX, this.cameras.main.centerY);
+                this.planetContainer.setPosition(this.cameraConfig.centerX, this.cameraConfig.centerY);
             }
 
             this.spawnArea = this.calculateSpawnArea();
@@ -140,11 +168,11 @@ export default class MainMenu extends Scene {
 
     updateBackgroundScale() {
         if (this.background) {
-            const scaleX = this.cameras.main.width / this.background.width;
-            const scaleY = this.cameras.main.height / this.background.height;
+            const scaleX = this.cameraConfig.width / this.background.width;
+            const scaleY = this.cameraConfig.height / this.background.height;
             const scale = Math.max(scaleX, scaleY);
             
-            this.background.setPosition(this.cameras.main.centerX, this.cameras.main.centerY)
+            this.background.setPosition(this.cameraConfig.centerX, this.cameraConfig.centerY)
                           .setScale(scale);
         }
     }
@@ -159,7 +187,7 @@ export default class MainMenu extends Scene {
             fontStyle: 'normal'
         };
 
-        this.planetContainer = this.add.container(this.cameras.main.centerX, this.cameras.main.centerY);
+        this.planetContainer = this.add.container(this.cameraConfig.centerX, this.cameraConfig.centerY);
 
         const tooltipBg = this.add.graphics();
         tooltipBg.fillStyle(0x000000, 0.8);
@@ -174,7 +202,7 @@ export default class MainMenu extends Scene {
             .setAlpha(0);
 
         this.planetContainer.add([nodePlanet, tooltipBg, tooltipText]);
-        
+        const isConnected = gameData.isConnected;
         nodePlanet.play('nodePlanet_anim').setScale(3).setInteractive()
             .on('pointerdown', () => {
                 this.tweens.add({
@@ -187,7 +215,7 @@ export default class MainMenu extends Scene {
                 
                 // nodePlanet.removeInteractive();
                 // this.scene.launch('RegisterBox');
-                this.checkWallet();
+                
                 
             })
             .on('pointerover', () => {
@@ -287,82 +315,13 @@ export default class MainMenu extends Scene {
         this.dusts = dustPool;
     }
 
-    // 잠시 주석
-    // async generateRandomEgg() {
-    //     try {
-    //         // 샘플 이미지 가져오기
-    //         const imageFile = this.textures.get('egg_sample').getSourceImage();
-            
-    //         // 이미지 생성
-    //         const { canvas, seed } = await this.imageGenerator.processImage(imageFile);
-            
-    //         // 결과 텍스처 생성
-    //         const texture = this.textures.createCanvas('generated_egg', canvas.width, canvas.height);
-    //         texture.draw(0, 0, canvas);
-    //         texture.refresh();
-
-    //         // 결과 이미지 표시
-    //         const sprite = this.add.sprite(400, 200, 'generated_egg')
-    //             .setScale(4); // 16x16 이미지를 4배 확대
-
-    //         // 시드 값 표시
-    //         this.add.text(400, 400, `Seed: ${seed}`, {
-    //             fontSize: '18px',
-    //             fill: '#fff'
-    //         }).setOrigin(0.5);
-
-    //         // 이미지 저장 버튼
-    //         const saveButton = this.add.text(400, 450, 'Save Image', {
-    //             fontSize: '20px',
-    //             fill: '#fff',
-    //             backgroundColor: '#4a4a4a',
-    //             padding: { x: 10, y: 5 }
-    //         })
-    //             .setOrigin(0.5)
-    //             .setInteractive();
-
-    //         saveButton.on('pointerdown', () => {
-    //             const sizes = [16, 32, 64];
-    //             sizes.forEach(size => {
-    //                 const resizedCanvas = document.createElement('canvas');
-    //                 resizedCanvas.width = size;
-    //                 resizedCanvas.height = size;
-    //                 const ctx = resizedCanvas.getContext('2d');
-    //                 ctx.imageSmoothingEnabled = false;
-    //                 ctx.drawImage(canvas, 0, 0, size, size);
-                    
-    //                 const link = document.createElement('a');
-    //                 link.download = `random_egg_${size}x${size}_${seed}.png`;
-    //                 link.href = resizedCanvas.toDataURL('image/png');
-    //                 link.click();
-    //             });
-    //         });
-
-    //     } catch (error) {
-    //         console.error('Failed to generate egg:', error);
-    //     }
-    // }
-
-    // crateRandomGenButton() {
-    //     this.randomGenButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY/2, 'Generate Random Egg', {
-    //         fontSize: '20px',
-    //         fill: '#fff',
-    //         backgroundColor: '#4a4a4a',
-    //         padding: { x: 10, y: 5 }
-    //     }).setOrigin(0.5).setInteractive()
-    //     .on('pointerdown', () => {
-    //         this.scene.launch('RandomGenerator');
-    //     });
-        
-    // }
-
     async checkWallet() {
         const walletAddress = gameData.getWalletAddress();
         if(walletAddress) {
             // 반투명한 검은색 배경 추가
             const darkOverlay = this.add.rectangle(0, 0, 
-                this.cameras.main.width,
-                this.cameras.main.height,
+                this.cameraConfig.width,
+                this.cameraConfig.height,
                 0x000000, 0.7
             ).setOrigin(0);
             darkOverlay.setDepth(100);
@@ -371,7 +330,7 @@ export default class MainMenu extends Scene {
             this.input.enabled = false;
 
             // 로딩 텍스트 생성
-            const loadingText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'check wallet...', {
+            const loadingText = this.add.text(this.cameraConfig.centerX, this.cameraConfig.centerY, 'check wallet...', {
                 fontFamily: 'Pixelify Sans',
                 fontSize: '24px',
                 color: '#ffffff'
@@ -402,9 +361,9 @@ export default class MainMenu extends Scene {
             });
 
             try {
-                const response = await axios.get('https://api.origin-forge.com/isUser', {
-                    params: { walletAddress }
-                });
+                // const response = await axios.get('https://api.origin-forge.com/isUser', {
+                //     params: { walletAddress }
+                // });
                 
     
                 // if(response.data.isUser) {
@@ -434,14 +393,14 @@ export default class MainMenu extends Scene {
         }
     }
 
-    
-
     destroy() {
         this.cleanupAnimations();
         this.scale.off('resize', this.handleResize, this);
         if (this.resizeTimeout) {
             clearTimeout(this.resizeTimeout);
         }
+        // check-wallet 이벤트 리스너 제거
+        EventBus.off('check-wallet');
         super.destroy();
     }
 }

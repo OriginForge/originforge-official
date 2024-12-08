@@ -1,35 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import { GameDataManager } from '../game/managers/GameDataManager';
-import { Menu, Home, Info, Gamepad2, Wallet } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { gameData } from '../game/managers/GameDataManager';
-export const ConnectBtn = () => {
-    const [isConnected, setIsConnected] = useState(false);
+import { EventBus } from '../game/EventBus';
+
+export const ConnectBtn = ({ onConnect }) => {
+    const isConnected = gameData.isConnected;
+    const [userData, setUserData] = useState(gameData._getPlayerInfo());
     
-    const checkUser = async (userId) => {
-        console.log(await gameData._checkIsUser("0x42087186aC1659Efe0F9b2f394ee93C8905422b4"));
+    useEffect(()=> {        
+        
+        
+        EventBus.on('user-info-updated', (info) => {
+            setUserData(info);
+        });
+
+    },[gameData])
+    
+    const typeColor = {
+        kaia: '#BFF009',
+        line: '#06C755',
+        telegram: '#24A1DE'
     }
 
+    const viewProfile = () => {
+        EventBus.emit('show-profile');
+    }
     return (
-        <>
-            {   
-                !isConnected ? (
-                    <button 
-                        className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
-                         border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white"
-                        onClick={()=>checkUser('123')}
-                    >
-                <Wallet size={16} color="#9CA3AF" />
-                Connect
-            </button>
-        ) : (
-            <button 
-                className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
-                         border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white"
-            >
-                <Wallet size={16} color="#9CA3AF" />
-                Connect
-            </button>
-        )}
-    </>
+        <div className="flex justify-center items-center">
+            {!isConnected ? (
+                <button 
+                    className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
+                     border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white"
+                    onClick={onConnect}
+                >
+                    <Wallet size={16} color="#9CA3AF" />
+                    Connect
+                </button>
+            ) : (
+                <button 
+                    onClick={viewProfile}
+                    className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
+                             border hover:border-gray-500 text-gray-300 hover:text-white"
+                    style={{borderColor: typeColor[userData.connectType]}}
+                >
+                    {/* <Wallet size={16} color={typeColor[userData.connectType]} /> */}
+                    {/* userData.nftImage를 이미지로 표시 해당 값은 base64 형식 */}
+                    <img src={userData.nftImage} alt="NFT" className="w-5 h-5" />
+                    {userData.nickName}
+                    {console.log(userData)}
+                </button>
+            )}
+        </div>
     )
 }

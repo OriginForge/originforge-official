@@ -4,22 +4,25 @@ import { useEffect, useState } from 'react';
 import { gameData } from '../game/managers/GameDataManager';
 import { useMediaQuery } from 'react-responsive';
 import logo from '../../public/favicon.png';
-import { Menu, Home, Info, Gamepad2, Wallet } from 'lucide-react';
+import { Menu, Home, Info, Gamepad2, Wallet, X, LogOut } from 'lucide-react';
 import { LineLogin } from './LineLogin';
 import ConnectModal from './ConnectModal';
 import { Lang } from '../game/managers/LanguageManager';
 import languages from '../game/config/languages';
 import { EventBus } from '../game/EventBus';
 import { ConnectBtn } from './ConnectBtn';
+
 export default function Header() {
     const isMobile = useMediaQuery({ maxWidth: 768 });
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showConnectModal, setShowConnectModal] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
     const logoSize = isMobile ? 'h-5 w-5' : 'h-7 w-7';
     const titleSize = isMobile ? 'text-2xl' : 'text-3xl';
     const [lineProfile, setLineProfile] = useState(gameData.getLineProfile());
+    const [userInfo, setUserInfo] = useState(gameData._getPlayerInfo());
 
-    const handleWalletClick = () => {
+    const handleConnect = () => {
         const gameContainer = document.getElementById('game-container');
         if (gameContainer) {
             gameContainer.style.pointerEvents = 'none';
@@ -35,7 +38,6 @@ export default function Header() {
         }
     };
 
-    // 모달이 닫힐 때 상호작용 다시 활성화
     useEffect(() => {
         const handleModalClose = () => {
             const gameContainer = document.getElementById('game-container');
@@ -44,7 +46,6 @@ export default function Header() {
             }
         };
 
-        // 모달이 닫힐 때 이벤트 리스너
         window.addEventListener('modal-closed', handleModalClose);
 
         return () => {
@@ -57,39 +58,83 @@ export default function Header() {
             setLineProfile(profile);
         };
 
+        const handleShowProfile = () => {
+            setShowProfileModal(true);
+        };
+
+        const handleUserInfoUpdate = (info) => {
+            setUserInfo(info);
+        };
+
         EventBus.on('line-profile-updated', handleLineProfileUpdate);
+        EventBus.on('show-profile', handleShowProfile);
+        EventBus.on('user-info-updated', handleUserInfoUpdate);
         
         return () => {
             EventBus.off('line-profile-updated', handleLineProfileUpdate);
+            EventBus.off('show-profile', handleShowProfile);
+            EventBus.off('user-info-updated', handleUserInfoUpdate);
         };
     }, []);
 
-    // const renderConnectButton = () => {
-    //     if (lineProfile) {
-    //         return (
-    //             <div className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
-    //                          border border-gray-700 text-gray-300">
-    //                 <img 
-    //                     src="/assets/connector/line/btn_base.png"
-    //                     alt="LINE Logo"
-    //                     className="w-4 h-4"
-    //                 />
-    //                 <span>{lineProfile.displayName}</span>
-    //             </div>
-    //         );
-    //     }
+    const handleDisconnect = () => {
+        gameData.disconnect();
+        setShowProfileModal(false);
+    };
 
-    //     return (
-    //         <button 
-    //             onClick={handleWalletClick}
-    //             className="flex items-center gap-2 font-pixelify text-sm rounded-md px-3 py-1.5 
-    //                      border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white"
-    //         >
-    //             <Wallet size={16} color="#9CA3AF" />
-    //             Connect
-    //         </button>
-    //     );
-    // };
+    const ProfileModal = () => {
+        if (!showProfileModal) return null;
+
+        const typeColor = {
+            kaia: '#BFF009',
+            line: '#06C755',
+            telegram: '#24A1DE'
+        };
+
+        return (
+            <div className="fixed inset-0 flex items-center justify-center z-[9999]">
+                <div 
+                    className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fadeIn"
+                    onClick={() => setShowProfileModal(false)}
+                />
+                <div className="relative bg-[#03191B]/95 border-2 border-[#01C9A2]/30 rounded-xl w-[400px] p-8 shadow-[0_0_15px_rgba(1,201,162,0.3)] animate-slideIn">
+                    <button
+                        onClick={() => setShowProfileModal(false)}
+                        className="absolute right-4 top-4 text-[#01C9A2] hover:text-white p-1.5 
+                                hover:bg-[#01C9A2]/20 rounded-lg transition-all duration-300"
+                    >
+                        <X size={20} />
+                    </button>
+                    
+                    <div className="flex flex-col items-center gap-4">
+                        <img src={userInfo.nftImage} alt="NFT" className="w-32 h-32 rounded-lg border-2" style={{borderColor: typeColor[userInfo.connectType]}} />
+                        <h2 className="font-pixelify text-2xl text-white">{userInfo.nickName}</h2>
+                        <div className="w-full space-y-2 mt-4">
+                            <div className="flex justify-between text-gray-300">
+                                <span>Wallet:</span>
+                                <span className="text-sm">{userInfo.userAddress?.slice(0,6)}...{userInfo.userAddress?.slice(-4)}</span>
+                            </div>
+                            
+                            <div className="flex justify-between text-gray-300">
+                                <span>Point:</span>
+                                <span>{userInfo.point || 0}</span>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={handleDisconnect}
+                            className="mt-6 flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 
+                                     hover:bg-red-500/30 text-red-400 hover:text-red-300 transition-all duration-300
+                                     border border-red-500/30 hover:border-red-500/50"
+                        >
+                            <LogOut size={18} />
+                            Disconnect
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     return (    
         <>
@@ -119,64 +164,20 @@ export default function Header() {
                     <div className="flex flex-1 items-center justify-end space-x-4">
                         {!isMobile && (
                             <nav className="flex items-center space-x-6">
-                                {/* <Link to="/about" className="flex items-center gap-2 font-pixelify text-gray-300 hover:text-white">
-                                    <Info size={16} />
-                                    <span>About</span>
-                                </Link>
-                                <Link to="/game" className="flex items-center gap-2 font-pixelify text-gray-300 hover:text-white">
-                                    <Gamepad2 size={16} />
-                                    <span>Game</span>
-                                </Link> */}
                             </nav>
                         )}
                         
                         <div className="flex items-center space-x-4">
-                            <ConnectBtn />
-                            
-                            {/* {isMobile && (
-                                <button 
-                                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                    className="rounded-md p-2 hover:bg-gray-700 text-white"
-                                >
-                                    <Menu size={24} />
-                                </button>
-                            )} */}
+                            <ConnectBtn onConnect={handleConnect} />
                         </div>
                     </div>
-
-                    {/* {isMobile && isMenuOpen && (
-                        <div className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur border-b border-gray-800">
-                            <nav className="flex flex-col items-center py-6 space-y-4">
-                                <Link to="/" 
-                                    className="flex items-center gap-3 px-6 py-3 font-pixelify text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 w-64"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    <Home size={20} />
-                                    <span className="font-medium">Home</span>
-                                </Link>
-                                <Link to="/about" 
-                                    className="flex items-center gap-3 px-6 py-3 font-pixelify text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 w-64"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    <Info size={20} />
-                                    <span className="font-medium">About</span>
-                                </Link>
-                                <Link to="/game" 
-                                    className="flex items-center gap-3 px-6 py-3 font-pixelify text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 w-64"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    <Gamepad2 size={20} />
-                                    <span className="font-medium">Game</span>
-                                </Link>
-                            </nav>
-                        </div>
-                    )} */}
                 </div>
             </header>
             <ConnectModal 
                 isOpen={showConnectModal} 
                 onClose={handleCloseModal}
             />
+            <ProfileModal />
         </>
     );   
 }

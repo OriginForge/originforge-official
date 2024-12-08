@@ -23,13 +23,48 @@ export class GameDataManager {
             userAddress: null,
             delegateAddress: null,
             nftId: null,
-            conenctType: null
+            nftImage: null,
+            connectType: null
         }
+
+        // 저장된 데이터가 있으면 불러오기
+        const cachedData = localStorage.getItem('gamePlayerInfo');
+        if (cachedData) {
+            const parsedData = JSON.parse(cachedData);
+            this.playerInfo = parsedData.playerInfo;
+            this.isConnected = parsedData.isConnected;
+        }
+
         GameDataManager.instance = this;
     }
 
     setConnect(){
+        this.isConnected = true;
+        this._saveToCache();
+    }
 
+    disconnect() {
+        this.isConnected = false;
+        this.playerInfo = {
+            userId: null,
+            nickName: null,
+            userAddress: null,
+            delegateAddress: null,
+            nftId: null,
+            nftImage: null,
+            connectType: null,
+            
+        };
+        localStorage.removeItem('gamePlayerInfo');
+        EventBus.emit('user-disconnected');
+    }
+
+    _saveToCache() {
+        const dataToSave = {
+            playerInfo: this.playerInfo,
+            isConnected: this.isConnected
+        };
+        localStorage.setItem('gamePlayerInfo', JSON.stringify(dataToSave));
     }
 
     /**
@@ -42,51 +77,48 @@ export class GameDataManager {
         return await ofContract.methods.get_isUser(userId).call()            
     }
 
-
     setPlayerInfo(userId, type){
-        
+        if(type === 'kaia'){
+            this.playerInfo.userId = userId;
+            this.playerInfo.userAddress = userId;
+            this.playerInfo.connectType = 'kaia';
+            this._saveToCache();
+        }
     }
     
-    getPlayerInfo() {
+    async getPlayerInfo(userId,type) {
+        const info = await ofContract.methods.get_User(userId).call();
+        
+        this.playerInfo = {
+            userId: info[0].userId,
+            nickName: info[0].userNickName,
+            userAddress: info[0].userWallet,
+            delegateAddress: info[0].delegateAccount,
+            nftId: info[0].userSBTId,
+            nftImage: info[1],
+            connectType: type
+        }
+        this.isConnected = true;
+        this._saveToCache();
+        EventBus.emit('user-info-updated', this.playerInfo);
+    }
+
+    _getPlayerInfo() {
         return this.playerInfo;
     }
-    // setWalletAddress(address) {
-    //     this.walletAddress = address;
-    //     EventBus.emit('wallet-connected', address);
-    // }
 
-    // async fetchPlayerData() {
-    //     /**
-    //      * @dev
-    //      * 1. nickName
-    //      * 2. nftId
-    //      * 
-    //      */
-    //     try {
-    //         // API 호출
-    //         const response = await fetch(`/api/player/${this.walletAddress}`);
-    //         const data = await response.json();
-    //         this.playerData = data;
-    //         this.isInitialized = true;
-    //         EventBus.emit('player-data-updated', data);
-    //         return data;
-    //     } catch (error) {
-    //         console.error('Failed to fetch player data:', error);
-    //         throw error;
-    //     }
-    // }
-
-    // getPlayerData() {
-    //     return this.playerData;
-    // }
+    isConnected() {
+        return this.isConnected;
+    }
 
     getWalletAddress() {
-        return this.walletAddress;
+        return this.playerInfo.userAddress;
     }
 
     setLineProfile(profile) {
         this.lineProfile = profile;
         EventBus.emit('line-profile-updated', profile);
+        this._saveToCache();
     }
 
     getLineProfile() {
@@ -98,5 +130,4 @@ export class GameDataManager {
     }
 }
 
-// 싱글톤 �스턴스 export
-export const gameData = GameDataManager.getInstance(); 
+export const gameData = GameDataManager.getInstance();

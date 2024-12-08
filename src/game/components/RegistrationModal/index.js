@@ -5,7 +5,6 @@ export default class RegistrationModal {
     constructor(scene) {
         this.scene = scene;
         this.modalBg = null;
-        this.isDragging = false;
         this.isEditing = false;
         this.warningText = null;
         this.nameInput = null;
@@ -111,10 +110,7 @@ export default class RegistrationModal {
         ).setDepth(201);
 
         const panel = this.scene.add.rectangle(0, 0, 500, 600, 0x1a1a1a)
-            .setStrokeStyle(2, 0x4a90e2)
-            .setInteractive();
-
-        this.setupDragBehavior(panel, this.container);
+            .setStrokeStyle(2, 0x4a90e2);
 
         const exitBtn = this.scene.add.image(230, -280, 'exitBtn')
             .setScale(1)
@@ -316,33 +312,12 @@ export default class RegistrationModal {
         this.isEditing = false;
         this.nameInput.setVisible(false);
         this.displayedText.setVisible(true);
-        this.cursor.setVisible(false);
+        // this.cursor.setVisible(false);
         this.cursorBlink.pause();
         if (this.keyboardListener) {
             this.scene.input.keyboard.off('keydown', this.keyboardListener);
             this.keyboardListener = null;
         }
-    }
-
-    setupDragBehavior(panel, container) {
-        panel.on('pointerdown', (pointer) => {
-            this.isDragging = true;
-            this.dragStartPos = {
-                x: pointer.x - container.x,
-                y: pointer.y - container.y
-            };
-        });
-
-        this.scene.input.on('pointermove', (pointer) => {
-            if (this.isDragging) {
-                container.x = pointer.x - this.dragStartPos.x;
-                container.y = pointer.y - this.dragStartPos.y;
-            }
-        });
-
-        this.scene.input.on('pointerup', () => {
-            this.isDragging = false;
-        });
     }
 
     startLoadingAnimation() {
@@ -391,6 +366,7 @@ export default class RegistrationModal {
         this.startLoadingAnimation();
 
         try {
+            console.log('herererere');
             const res = await axios.post('https://api.origin-forge.com/register', {
                 userId: gameData.getWalletAddress(),
                 userAddress: gameData.getWalletAddress(),
@@ -576,14 +552,6 @@ export default class RegistrationModal {
             color: '#cccccc',
             align: 'center'
         }).setOrigin(0.5);
-
-        // const colorSetText = this.scene.add.text(0, 0,
-        //     `🎨 Color Set: ${this.generatedNFT.colorSet}`, {
-        //     fontFamily: 'Pixelify Sans',
-        //     fontSize: isMobile ? '18px' : '22px',
-        //     color: '#cccccc',
-        //     align: 'center'
-        // }).setOrigin(0.5);
 
         const seedText = this.scene.add.text(0, infoSectionHeight * 0.1,
             `🌱 Seed: ${this.generatedNFT.seed.substring(0, 8)}...`, {
