@@ -47,7 +47,7 @@ function App ({isMobile}){
 
     return (
         <HelmetProvider>
-            <BrowserRouter basename="/">
+            <Router basename="/">
                 <div id="app">
                     <Header />    
                     <Helmet>
@@ -65,7 +65,7 @@ function App ({isMobile}){
                         <Route path="*" element={<Navigate to="/404" replace />} />
                     </Routes>
                 </div>
-            </BrowserRouter>
+            </Router>
         </HelmetProvider>
     )
 }
