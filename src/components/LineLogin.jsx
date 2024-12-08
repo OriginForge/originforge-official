@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLiff } from 'react-liff';
 import { Lang } from '../game/managers/LanguageManager';
-import { GameDataManager } from '../game/managers/GameDataManager';
+import { gameData } from '../game/managers/GameDataManager';
+import { EventBus } from '../game/EventBus';
 
 export const LineLogin = () => {
     const [displayName, setDisplayName] = useState('');
@@ -9,7 +10,7 @@ export const LineLogin = () => {
     const [isPressed, setIsPressed] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
     const { error, isLoggedIn, isReady, liff } = useLiff();
-    const gameData = GameDataManager.getInstance();
+    
 
     useEffect(() => {
         if (!isLoggedIn) return;
@@ -23,7 +24,7 @@ export const LineLogin = () => {
     }, [liff, isLoggedIn]);
 
     const getButtonIcon = () => {        
-        if (isPressed) return '/assets/connector/line/btn_press.png';
+        // if (isPressed) return '/assets/connector/line/btn_press.png';
         if (isHovered) return '/assets/connector/line/btn_hover.png';
         return '/assets/connector/line/btn_base.png';
     };
