@@ -1,7 +1,7 @@
 import { useRef, useState , useEffect } from 'react';
 import Phaser from 'phaser';
 import { PhaserGame } from './game/PhaserGame';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import Header from './components/Header';
 import NotFound from './components/NotFound';
 // import { modal } from './main';
@@ -9,7 +9,7 @@ import NotFound from './components/NotFound';
 // import { injected } from 'wagmi/connectors'
 import liff from "@line/liff"
 import {useLiff} from 'react-liff'
-
+import UserRoutePage from './components/User/UserRoutePage';
 import '../public/style.css';
 
 function App ({isMobile}){
@@ -67,6 +67,7 @@ function App ({isMobile}){
                     <Route path="/" element={<PhaserGame ref={phaserRef} />} />
                     <Route path="/game" element={<PhaserGame ref={phaserRef} />} />
                     <Route path="*" element={<NotFound />} />
+                    <Route path="/user/:nickname" element={<UserRoutePage />} />
                 </Routes>
             </div>
         </Router>

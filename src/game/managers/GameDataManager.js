@@ -87,7 +87,7 @@ export class GameDataManager {
     }
     
     async getPlayerInfo(userId,type) {
-        const info = await ofContract.methods.get_User(userId).call();
+        const info = await ofContract.methods.get_User(String(userId).toLocaleLowerCase()).call();
         
         this.playerInfo = {
             userId: info[0].userId,
@@ -101,6 +101,11 @@ export class GameDataManager {
         this.isConnected = true;
         this._saveToCache();
         EventBus.emit('user-info-updated', this.playerInfo);
+    }
+
+    async getPageUserInfo(userId) {
+        const info = await ofContract.methods.get_User(String(userId).toLocaleLowerCase()).call();
+        return info;
     }
 
     _getPlayerInfo() {
