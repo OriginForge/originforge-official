@@ -8,7 +8,7 @@ import liff from "@line/liff"
 import {useLiff} from 'react-liff'
 import UserRoutePage from './components/User/UserRoutePage';
 import '../public/style.css';
-import { HelmetProvider } from 'react-helmet-async';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 
 function App ({isMobile}){
     const [displayName, setDisplayName] = useState(null);
