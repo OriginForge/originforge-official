@@ -119,32 +119,32 @@ export default function Header() {
                     <div className="flex flex-1 items-center justify-end space-x-4">
                         {!isMobile && (
                             <nav className="flex items-center space-x-6">
-                                <Link to="/about" className="flex items-center gap-2 font-pixelify text-gray-300 hover:text-white">
+                                {/* <Link to="/about" className="flex items-center gap-2 font-pixelify text-gray-300 hover:text-white">
                                     <Info size={16} />
                                     <span>About</span>
                                 </Link>
                                 <Link to="/game" className="flex items-center gap-2 font-pixelify text-gray-300 hover:text-white">
                                     <Gamepad2 size={16} />
                                     <span>Game</span>
-                                </Link>
+                                </Link> */}
                             </nav>
                         )}
                         
                         <div className="flex items-center space-x-4">
                             {renderConnectButton()}
                             
-                            {isMobile && (
+                            {/* {isMobile && (
                                 <button 
                                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                                     className="rounded-md p-2 hover:bg-gray-700 text-white"
                                 >
                                     <Menu size={24} />
                                 </button>
-                            )}
+                            )} */}
                         </div>
                     </div>
 
-                    {isMobile && isMenuOpen && (
+                    {/* {isMobile && isMenuOpen && (
                         <div className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur border-b border-gray-800">
                             <nav className="flex flex-col items-center py-6 space-y-4">
                                 <Link to="/" 
@@ -170,7 +170,7 @@ export default function Header() {
                                 </Link>
                             </nav>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </header>
             <ConnectModal 
