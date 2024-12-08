@@ -5,7 +5,7 @@ import NotFound from '../NotFound';
 import { motion } from 'framer-motion';
 import { Gift, Navigation, ExternalLink, Share2, QrCode } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 export default function UserRoutePage() {
     const { nickname } = useParams();

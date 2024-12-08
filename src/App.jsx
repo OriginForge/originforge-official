@@ -11,6 +11,7 @@ import liff from "@line/liff"
 import {useLiff} from 'react-liff'
 import UserRoutePage from './components/User/UserRoutePage';
 import '../public/style.css';
+import { HelmetProvider } from 'react-helmet-async';
 
 function App ({isMobile}){
     // const { connect } = useConnect()
@@ -59,18 +60,20 @@ function App ({isMobile}){
     // }, [isMobile])
 
     return (
-        <Router>
-            <div id="app">
-                <Header />    
-                
-                <Routes>
-                    <Route path="/" element={<PhaserGame ref={phaserRef} />} />
-                    <Route path="/game" element={<PhaserGame ref={phaserRef} />} />
-                    <Route path="*" element={<NotFound />} />
-                    <Route path="/user/:nickname" element={<UserRoutePage />} />
-                </Routes>
-            </div>
-        </Router>
+        <HelmetProvider>
+            <Router>
+                <div id="app">
+                    <Header />    
+                    
+                    <Routes>
+                        <Route path="/" element={<PhaserGame ref={phaserRef} />} />
+                        <Route path="/game" element={<PhaserGame ref={phaserRef} />} />
+                        <Route path="*" element={<NotFound />} />
+                        <Route path="/user/:nickname" element={<UserRoutePage />} />
+                    </Routes>
+                </div>
+            </Router>
+        </HelmetProvider>
     )
 }
 
