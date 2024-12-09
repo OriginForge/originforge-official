@@ -24,7 +24,12 @@ export default defineConfig({
         phasermsg(),
         nodePolyfills(),
     ],
-    logLevel: 'warning',
+    server: {
+        historyApiFallback: true,
+    },
+    preview: {
+        historyApiFallback: true,
+    },
     build: {
         rollupOptions: {
             output: {
@@ -33,6 +38,8 @@ export default defineConfig({
                 }
             }
         },
+        assetsDir: 'assets',
+        emptyOutDir: true,
         minify: 'terser',
         terserOptions: {
             compress: {
