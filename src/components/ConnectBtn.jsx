@@ -15,22 +15,16 @@ export const ConnectBtn = ({ onConnect }) => {
         });
     },[gameData])
     
-    useEffect(() => {
-        if (!isLoggedIn) return;
+    useEffect(()=> {
+        initCheck();
+    },[])
 
-        try{
 
-            (async () => {
-                const profile = await liff.getProfile();
-                setDisplayName(profile.displayName);
-                gameData.setLineProfile(profile);
-                console.log('hhhhh',profile);
-            })();
-        } catch(error){
-            console.log(error);
-        }
-    }, [liff, isLoggedIn]);
-
+    const initCheck = async () => {
+        const profile = await liff.getProfile();
+        console.log(profile);
+    
+    }
     const typeColor = {
         kaia: '#BFF009',
         line: '#06C755',
