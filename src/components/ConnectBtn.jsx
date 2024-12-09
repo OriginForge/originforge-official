@@ -15,9 +15,13 @@ export const ConnectBtn = ({ onConnect }) => {
     
     useEffect(()=> {
         // if(isLoggedIn){
-             liff.getProfile().then((profile) => {
-                console.log(profile);
-            });
+        try{
+            liff.getProfile().then((profile) => {
+               console.log(profile);
+           });
+        } catch(error){
+            console.log(error);
+        }
         // }
     },[])
 
