@@ -14,17 +14,7 @@ export const ConnectBtn = ({ onConnect }) => {
             setUserData(info);
         });
     },[gameData])
-    
-    useEffect(()=> {
-        initCheck();
-    },[])
 
-
-    const initCheck = async () => {
-        const profile = await liff.getProfile();
-        console.log(profile);
-    
-    }
     const typeColor = {
         kaia: '#BFF009',
         line: '#06C755',

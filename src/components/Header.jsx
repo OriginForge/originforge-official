@@ -12,6 +12,7 @@ import languages from '../game/config/languages';
 import { EventBus } from '../game/EventBus';
 import { ConnectBtn } from './ConnectBtn';
 import ProfileModal from './ProfileModal';
+import { useLiff } from 'react-liff';
 
 export default function Header() {
     const isMobile = useMediaQuery({ maxWidth: 768 });
@@ -21,7 +22,7 @@ export default function Header() {
     const titleSize = isMobile ? 'text-2xl' : 'text-3xl';
     const [lineProfile, setLineProfile] = useState(gameData.getLineProfile());
     const [userInfo, setUserInfo] = useState(gameData._getPlayerInfo());
-
+    const { error, isLoggedIn, isReady, liff } = useLiff();
     const typeColor = {
         kaia: '#BFF009',
         line: '#06C755',
@@ -76,6 +77,14 @@ export default function Header() {
             EventBus.off('user-info-updated', handleUserInfoUpdate);
         };
     }, []);
+
+    useEffect(()=>{
+        if(isReady){
+            liff.getProfile().then((profile) => {
+                console.log(profile);
+            });
+        }
+    },[isReady])
 
     const handleShowProfile = () => {
         EventBus.emit('show-profile');
