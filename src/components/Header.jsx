@@ -80,9 +80,7 @@ export default function Header() {
 
     useEffect(()=>{
         if(isReady){
-            liff.getProfile().then((profile) => {
-                console.log(profile);
-            });
+            
         }
     },[isReady])
 

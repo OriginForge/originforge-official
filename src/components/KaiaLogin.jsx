@@ -31,7 +31,7 @@ export const KaiaLogin = () => {
             const isUser = await gameData._checkIsUser(accounts[0]);
             
             if(!isUser){
-                gameData.setPlayerInfo(accounts[0], 'kaia');
+                gameData.setPlayerInfo_kaia(accounts[0]);
                 gameData.getWalletAddress()
                 // ConnectModal 닫기
                 EventBus.emit('connect-modal-closed');

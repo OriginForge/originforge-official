@@ -77,15 +77,22 @@ export class GameDataManager {
         return await ofContract.methods.get_isUser(userId).call()            
     }
 
-    setPlayerInfo(userId, type){
-        if(type === 'kaia'){
+    setPlayerInfo_kaia(userId){
+
             this.playerInfo.userId = userId;
             this.playerInfo.userAddress = userId;
             this.playerInfo.connectType = 'kaia';
             this._saveToCache();
-        }
+
     }
     
+    setPlayerInfo_line(userId){
+            this.playerInfo.userId = userId;
+            this.playerInfo.userAddress = null;
+            this.playerInfo.connectType = 'line';
+            this._saveToCache();
+    }
+
     async getPlayerInfo(userId,type) {
         const info = await ofContract.methods.get_User(String(userId).toLocaleLowerCase()).call();
         
