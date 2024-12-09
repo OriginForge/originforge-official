@@ -18,7 +18,7 @@ const phasermsg = () => {
 }
 
 export default defineConfig({
-    base: './',
+    base: '/',
     plugins: [
         react(),
         phasermsg(),
@@ -26,18 +26,16 @@ export default defineConfig({
     ],
     server: {
         historyApiFallback: true,
+        middlewareMode: true
     },
     preview: {
-        historyApiFallback: true,
+        port: 8080,
+        strictPort: true,
+        host: true,
+        historyApiFallback: true
     },
     build: {
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    phaser: ['phaser']
-                }
-            }
-        },
+        outDir: 'dist',
         assetsDir: 'assets',
         emptyOutDir: true,
         minify: 'terser',
