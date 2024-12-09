@@ -19,7 +19,7 @@ export const LineLogin = () => {
             const profile = await liff.getProfile();
             setDisplayName(profile.displayName);
             gameData.setLineProfile(profile);
-            console.log(profile);
+            console.log('here',profile);
         })();
     }, [liff, isLoggedIn]);
 

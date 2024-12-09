@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Wallet } from 'lucide-react';
 import { gameData } from '../game/managers/GameDataManager';
 import { EventBus } from '../game/EventBus';
-
+import { useLiff } from 'react-liff';
 export const ConnectBtn = ({ onConnect }) => {
     const isConnected = gameData.isConnected;
     const [userData, setUserData] = useState(gameData._getPlayerInfo());
-    
+    const { error, isLoggedIn, isReady, liff } = useLiff();
     useEffect(()=> {        
         
         
@@ -16,6 +16,13 @@ export const ConnectBtn = ({ onConnect }) => {
 
     },[gameData])
     
+    useEffect(()=> {
+        if(isLoggedIn){
+             liff.getProfile().then((profile) => {
+                console.log(profile);
+            });
+        }
+    },[])
     const typeColor = {
         kaia: '#BFF009',
         line: '#06C755',
