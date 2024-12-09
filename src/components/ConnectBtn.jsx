@@ -7,23 +7,29 @@ export const ConnectBtn = ({ onConnect }) => {
     const isConnected = gameData.isConnected;
     const [userData, setUserData] = useState(gameData._getPlayerInfo());
     const { error, isLoggedIn, isReady, liff } = useLiff();
+
+    // console.log(onConnect);
     useEffect(()=> {        
         EventBus.on('user-info-updated', (info) => {
             setUserData(info);
         });
     },[gameData])
     
-    useEffect(()=> {
-        // if(isLoggedIn){
+    useEffect(() => {
+        if (!isLoggedIn) return;
+
         try{
-            liff.getProfile().then((profile) => {
-               console.log(profile);
-           });
+
+            (async () => {
+                const profile = await liff.getProfile();
+                setDisplayName(profile.displayName);
+                gameData.setLineProfile(profile);
+                console.log('hhhhh',profile);
+            })();
         } catch(error){
             console.log(error);
         }
-        // }
-    },[])
+    }, [liff, isLoggedIn]);
 
     const typeColor = {
         kaia: '#BFF009',
