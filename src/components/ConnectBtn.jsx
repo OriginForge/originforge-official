@@ -8,21 +8,19 @@ export const ConnectBtn = ({ onConnect }) => {
     const [userData, setUserData] = useState(gameData._getPlayerInfo());
     const { error, isLoggedIn, isReady, liff } = useLiff();
     useEffect(()=> {        
-        
-        
         EventBus.on('user-info-updated', (info) => {
             setUserData(info);
         });
-
     },[gameData])
     
     useEffect(()=> {
-        if(isLoggedIn){
+        // if(isLoggedIn){
              liff.getProfile().then((profile) => {
                 console.log(profile);
             });
-        }
+        // }
     },[])
+
     const typeColor = {
         kaia: '#BFF009',
         line: '#06C755',
