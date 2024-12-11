@@ -57,6 +57,7 @@ function App ({isMobile}){
                         <Route path="/user/:nickname" element={<UserRoutePage />} />
                         <Route path="/404" element={<NotFound />} />
                         <Route path="*" element={<Navigate to="/404" replace />} />
+                        {/* <Route path="/games/elemental" element={<ElementalGame />} /> */}
                     </Routes>
                 </div>
             </Router>
